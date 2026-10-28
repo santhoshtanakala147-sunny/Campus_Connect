@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Sign up - CampusConnect{% endblock %}
+{% block content %}
+<div class="card form-card">
+    <h1>Create your account</h1>
+    <p class="subtitle">Use your official college email to join.</p>
+    <form method="POST">
+        <label>Full name</label>
+        <input type="text" name="full_name" required>
+
+        <label>College</label>
+        <input type="text" name="college" required>
+
+        <label>College email</label>
+        <input type="email" name="email" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required minlength="8">
+
+        <label>Confirm password</label>
+        <input type="password" name="confirm_password" required minlength="8">
+
+        <button type="submit">Sign up</button>
+    </form>
+    <p class="switch-link">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+</div>
+{% endblock %}

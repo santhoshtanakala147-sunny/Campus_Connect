@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="app-nav"></nav>
+
+    <main class="container">
+        <div class="card">
+            <div class="feed-tabs">
+                <button class="tab-btn active" data-game="tictactoe">Tic-Tac-Toe</button>
+                <button class="tab-btn" data-game="puzzle">Sliding Puzzle</button>
+            </div>
+
+            <div id="tictactoe-panel">
+                <h1>Tic-Tac-Toe</h1>
+                <p class="subtitle" id="ttt-status">You are X. Beat the CPU.</p>
+                <div id="ttt-board" class="ttt-board"></div>
+                <button class="small-btn" id="ttt-reset" style="margin-top: 16px;">New game</button>
+            </div>
+
+            <div id="puzzle-panel" style="display:none;">
+                <h1>Sliding Puzzle</h1>
+                <p class="subtitle" id="puzzle-status">Arrange the tiles in order.</p>
+                <div id="puzzle-board" class="puzzle-board"></div>
+                <button class="small-btn" id="puzzle-reset" style="margin-top: 16px;">Shuffle</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/notif.js"></script>
+    <script src="js/games.js"></script>
+</body>
+</html>

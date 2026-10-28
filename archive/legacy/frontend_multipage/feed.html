@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="app-nav"></nav>
+
+    <main class="container">
+        <div class="card">
+            <h1>Share something</h1>
+            <div id="composer-flash" class="flash"></div>
+            <form id="composer-form">
+                <textarea id="post-content" rows="3" placeholder="What's on your mind?" maxlength="2000"></textarea>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 24px;">
+            <div class="feed-tabs">
+                <button class="tab-btn active" data-tab="recent">Recent</button>
+                <button class="tab-btn" data-tab="trending">Trending</button>
+            </div>
+            <div id="posts-flash" class="flash"></div>
+            <div id="posts-list" class="list"></div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/notif.js"></script>
+    <script src="js/feed.js"></script>
+</body>
+</html>

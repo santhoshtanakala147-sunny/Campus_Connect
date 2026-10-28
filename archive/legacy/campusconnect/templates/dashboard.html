@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - CampusConnect{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Welcome, {{ user['full_name'] }}</h1>
+    <p class="subtitle">{{ user['college'] }}</p>
+    <div class="stat-row">
+        <div class="stat">
+            <div class="stat-number">{{ friend_count }}</div>
+            <div class="stat-label">Friends</div>
+        </div>
+    </div>
+    <p class="placeholder-note">Feed, friend requests, groups, and events land here in the next build steps.</p>
+</div>
+{% endblock %}

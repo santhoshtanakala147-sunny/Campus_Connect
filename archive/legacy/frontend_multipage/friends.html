@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="app-nav"></nav>
+
+    <main class="container">
+        <div class="card">
+            <h1>Find students</h1>
+            <div id="search-flash" class="flash"></div>
+            <input type="text" id="search-input" placeholder="Search by name, college, or email...">
+            <div id="search-results" class="list"></div>
+        </div>
+
+        <div class="card" style="margin-top: 24px;">
+            <h1>Pending requests</h1>
+            <div id="requests-flash" class="flash"></div>
+            <h2 class="section-label">Incoming</h2>
+            <div id="incoming-list" class="list"></div>
+            <h2 class="section-label">Sent</h2>
+            <div id="outgoing-list" class="list"></div>
+        </div>
+
+        <div class="card" style="margin-top: 24px;">
+            <h1>Your friends</h1>
+            <div id="friends-list" class="list"></div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/notif.js"></script>
+    <script src="js/friends.js"></script>
+</body>
+</html>

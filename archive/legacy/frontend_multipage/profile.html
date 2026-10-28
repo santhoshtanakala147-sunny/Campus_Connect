@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="app-nav"></nav>
+
+    <main class="container">
+        <div class="card form-card">
+            <h1 id="name">Loading...</h1>
+            <p class="subtitle" id="email-college"></p>
+            <div id="flash" class="flash"></div>
+            <form id="profile-form">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" rows="3"></textarea>
+
+                <label for="major">Major</label>
+                <input type="text" id="major" name="major">
+
+                <label for="year">Year</label>
+                <input type="text" id="year" name="year">
+
+                <label for="interests">Interests</label>
+                <input type="text" id="interests" name="interests" placeholder="comma-separated">
+
+                <button type="submit">Save changes</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/notif.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>

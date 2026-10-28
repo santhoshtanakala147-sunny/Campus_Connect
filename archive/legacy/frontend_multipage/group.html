@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="app-nav"></nav>
+
+    <main class="container">
+        <div class="card">
+            <h1 id="group-name">Loading...</h1>
+            <p class="subtitle" id="group-meta"></p>
+            <div id="group-flash" class="flash"></div>
+            <button class="small-btn secondary" id="leave-btn">Leave group</button>
+        </div>
+
+        <div class="card" style="margin-top: 24px;">
+            <h1>Post to this group</h1>
+            <div id="composer-flash" class="flash"></div>
+            <form id="composer-form">
+                <textarea id="post-content" rows="3" placeholder="Share a resource, question, or announcement..." maxlength="2000"></textarea>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 24px;">
+            <h1>Group posts</h1>
+            <div id="posts-list" class="list"></div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/group.js"></script>
+</body>
+</html>

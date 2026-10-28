@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-shell">
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <div class="logo-mark" id="hero-logo"></div>
+                <h2>Your campus, connected.</h2>
+                <p>A private network just for verified students — share resources, ask questions, and meet people in your major across colleges.</p>
+                <div class="auth-hero-features" id="hero-features"></div>
+            </div>
+        </div>
+
+        <div class="auth-form-side">
+            <div class="card form-card">
+                <h1>Create your account</h1>
+                <p class="subtitle">Use your official college email to join — .edu, .ac.in, and most university domains work.</p>
+                <div id="flash" class="flash"></div>
+                <form id="register-form">
+                    <label for="full_name">Full name</label>
+                    <input type="text" id="full_name" name="full_name" placeholder="Jordan Lee" required>
+
+                    <label for="college">College</label>
+                    <input type="text" id="college" name="college" placeholder="Amrita Vishwa Vidyapeetham" required>
+
+                    <label for="email">College email</label>
+                    <input type="email" id="email" name="email" placeholder="you@college.edu" required>
+
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="At least 8 characters" required minlength="8">
+
+                    <label for="confirm_password">Confirm password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required minlength="8">
+
+                    <button type="submit">Sign up</button>
+                </form>
+                <p class="switch-link">Already have an account? <a href="login.html">Log in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.getElementById("hero-logo").innerHTML = `${ICONS.brand}<span>CampusConnect</span>`;
+        document.getElementById("hero-features").innerHTML = `
+            <div class="auth-hero-feature"><span class="icon-badge">${ICONS.lock}</span> Verified with your official college email</div>
+            <div class="auth-hero-feature"><span class="icon-badge">${ICONS.chat}</span> Post, comment, and get trending on the feed</div>
+            <div class="auth-hero-feature"><span class="icon-badge">${ICONS.games}</span> Take a break with quick campus games</div>
+        `;
+    </script>
+    <script src="js/register.js"></script>
+</body>
+</html>

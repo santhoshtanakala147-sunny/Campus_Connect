@@ -1,0 +1,3229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusConnect</title>
+<script>
+(function () {
+    var t = null;
+    try { t = localStorage.getItem("cc_theme"); } catch (e) {}
+    if (!t) t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
+<link rel="stylesheet" href="/reels.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+/* ---------- Tokens ----------
+   Library green + chalk, with marigold as the single highlight.
+   Variable names (--primary, --border, ...) are shared with reels.css and the pet. */
+:root {
+    --font-display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+    --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    --bg: #F1F4EF;
+    --surface: #FFFFFF;
+    --surface-2: #F6F8F5;
+    --text: #12201B;
+    --muted: #5C6C65;
+    --border: #DCE3DC;
+    --line: #DCE3DC;
+
+    --primary: #0B6B4F;
+    --primary-dark: #08523D;
+    --primary-light: #E0F0E8;
+    --primary-ink: #08523D;
+    --primary-soft-hover: #CFE7DB;
+    --accent: #F2A93B;
+    --accent-ink: #7A4B00;
+    --accent-soft: #FCEFD6;
+
+    --gold: #9A6A12;
+    --gold-light: #FCEFD6;
+    --error: #C8412A;
+    --error-bg: #FBE9E4;
+    --success: #137A52;
+    --success-bg: #DFF3E9;
+    --navy: #0A2A21;
+
+    --side: #0A2A21;
+    --side-2: #11392D;
+    --side-text: #D3E5DC;
+    --side-muted: #86A598;
+
+    --net-bg: #F7F9F6;
+    --net-fof: #6F8EA3;
+    --net-line: #C6D0C8;
+
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(18, 32, 27, .04);
+    --shadow-hover: 0 10px 30px rgba(18, 32, 27, .14);
+    color-scheme: light;
+}
+[data-theme="dark"] {
+    --bg: #0B1310;
+    --surface: #121D18;
+    --surface-2: #17251F;
+    --text: #E6EEE9;
+    --muted: #8DA096;
+    --border: #243630;
+    --line: #243630;
+
+    --primary: #17895F;
+    --primary-dark: #0F6F4C;
+    --primary-light: #17332A;
+    --primary-ink: #6EE7B7;
+    --primary-soft-hover: #1E4237;
+    --accent: #F5B556;
+    --accent-ink: #F5B556;
+    --accent-soft: #2E2510;
+
+    --gold: #E5B04B;
+    --gold-light: #2E2510;
+    --error: #FF8466;
+    --error-bg: #34201B;
+    --success: #5FD6A3;
+    --success-bg: #14312A;
+    --navy: #06100C;
+
+    --side: #07140F;
+    --side-2: #0E2119;
+    --side-text: #C5D8CE;
+    --side-muted: #7B978A;
+
+    --net-bg: #0E1914;
+    --net-fof: #7FA0B5;
+    --net-line: #2B4038;
+
+    --shadow-hover: 0 12px 34px rgba(0, 0, 0, .5);
+    color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+    color: var(--text); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, .brand { font-family: var(--font-display); }
+a { color: var(--primary-ink); }
+:focus-visible { outline: 2px solid var(--primary-ink); outline-offset: 2px; }
+.sidebar :focus-visible { outline-color: #fff; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Base controls ---------- */
+label { display: block; margin-top: 16px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+input, textarea, select {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 14.5px; font-family: inherit; color: var(--text); background: var(--surface-2);
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: .75; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px var(--primary-light); }
+button {
+    margin-top: 20px; width: 100%; padding: 11px 16px; background: var(--primary); color: #fff; border: 0;
+    border-radius: var(--radius-sm); font-size: 14.5px; font-weight: 600; font-family: inherit; cursor: pointer;
+    transition: background .15s ease, transform .1s ease, opacity .15s ease;
+}
+button:hover { background: var(--primary-dark); }
+button:active { transform: translateY(1px); }
+button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+/* Buttons that must not inherit the full-width form-button look */
+.ghost { margin: 0; width: auto; padding: 0; background: none; border: 0; border-radius: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.ghost:hover, .ghost:active { background: none; transform: none; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
+.form-card { max-width: 480px; }
+.card h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+.subtitle { color: var(--muted); margin: 4px 0 0; font-size: 14px; }
+.loading-note { color: var(--muted); font-size: 14px; }
+.section-label { font-family: var(--font-body); font-size: 13.5px; margin: 20px 0 8px; color: var(--muted); font-weight: 600; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.flash { padding: 10px 14px; border-radius: var(--radius-sm); margin: 12px 0 0; font-size: 13.5px; font-weight: 500; display: none; }
+.flash.visible { display: block; }
+.flash-error { background: var(--error-bg); color: var(--error); }
+.flash-success { background: var(--success-bg); color: var(--success); }
+.switch-link { margin-top: 18px; font-size: 14px; color: var(--muted); }
+.switch-link a { color: var(--primary-ink); font-weight: 600; text-decoration: none; cursor: pointer; }
+.switch-link a:hover { text-decoration: underline; }
+.link-btn { background: none; border: 0; padding: 0; margin: 0; width: auto; color: var(--primary-ink); font: inherit; font-weight: 600; cursor: pointer; }
+.link-btn:hover { background: none; text-decoration: underline; }
+
+.small-btn {
+    margin: 0; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 14px;
+    background: var(--primary); color: #fff; border: 0; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer;
+}
+.small-btn:hover { background: var(--primary-dark); }
+.small-btn.secondary { background: var(--surface-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--border); }
+.small-btn.secondary:hover { background: var(--primary-light); color: var(--primary-ink); }
+.small-btn.danger { background: transparent; color: var(--error); box-shadow: inset 0 0 0 1px var(--error-bg); }
+.small-btn.danger:hover { background: var(--error-bg); }
+.icon-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.like-btn.liked { background: var(--accent-soft); color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent); }
+.like-btn.liked svg { fill: currentColor; }
+.tag { font-size: 12px; font-weight: 600; color: var(--primary-ink); background: var(--primary-light); padding: 4px 11px; border-radius: 999px; white-space: nowrap; }
+.tag.gold { color: var(--accent-ink); background: var(--accent-soft); }
+.empty-note { color: var(--muted); font-size: 14px; text-align: center; padding: 20px 12px; }
+.empty-state { text-align: center; padding: 34px 16px; color: var(--muted); }
+.empty-state-icon { width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 12px; background: var(--primary-light); color: var(--primary-ink); display: flex; align-items: center; justify-content: center; }
+.empty-state-icon svg { width: 24px; height: 24px; }
+.empty-state p { margin: 0; font-size: 14px; }
+
+/* Section heading inside cards */
+.section-title { display: flex; align-items: center; gap: 12px; }
+.title-icon { flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px; background: var(--primary-light); color: var(--primary-ink); display: flex; align-items: center; justify-content: center; }
+.title-icon svg { width: 19px; height: 19px; }
+.title-icon.gold, .title-icon.accent { background: var(--accent-soft); color: var(--accent-ink); }
+
+/* Segmented tabs */
+.feed-tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; }
+.tab-btn { width: auto; margin: 0; padding: 7px 15px; background: transparent; color: var(--muted); border: 0; border-radius: 9px; font-size: 13.5px; font-weight: 600; }
+.tab-btn:hover { background: transparent; color: var(--text); }
+.tab-btn.active { background: var(--surface); color: var(--primary-ink); box-shadow: 0 1px 3px rgba(18, 32, 27, .12), inset 0 0 0 1px var(--border); }
+
+/* ---------- Avatars and rows ---------- */
+.avatar {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #fff; background: var(--primary);
+}
+.avatar svg { width: 18px; height: 18px; }
+.avatar.small { width: 34px; height: 34px; font-size: 12.5px; }
+.avatar.tile { border-radius: 11px; background: var(--primary-light); color: var(--primary-ink); }
+.person-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    transition: border-color .15s ease, background .15s ease;
+}
+.person-row:hover { border-color: var(--primary); background: var(--surface-2); }
+.person-main { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.person-name { font-weight: 600; font-size: 14.5px; }
+.person-name a { color: var(--text); text-decoration-color: var(--border); text-underline-offset: 3px; }
+.person-name a:hover { color: var(--primary-ink); text-decoration-color: var(--primary-ink); }
+.person-meta { font-size: 12.5px; color: var(--muted); margin-top: 1px; overflow-wrap: anywhere; }
+.person-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* ---------- Posts ---------- */
+#post-content, #group-post-content { resize: vertical; }
+.post-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; background: var(--surface); transition: border-color .15s ease; }
+.post-card:hover { border-color: var(--primary); }
+.post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.post-header-text { display: flex; flex-direction: column; line-height: 1.25; }
+.post-author { font-weight: 600; font-size: 14.5px; }
+.post-time { font-size: 12.5px; color: var(--muted); }
+.post-content { font-size: 15px; line-height: 1.6; margin-bottom: 14px; white-space: pre-wrap; max-width: 68ch; }
+.post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.comments-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.comments-list { margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.comment-row { font-size: 14px; background: var(--surface-2); padding: 9px 12px; border-radius: var(--radius-sm); }
+.comment-author { font-weight: 600; margin-right: 6px; }
+.comment-form { display: flex; gap: 8px; }
+.comment-form input { flex: 1; }
+.comment-form button { width: auto; margin-top: 0; }
+.announce-body { white-space: pre-wrap; margin-top: 4px; font-size: 14px; }
+.composer { display: flex; gap: 12px; align-items: flex-start; }
+.composer form { flex: 1; min-width: 0; }
+.composer-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 10px; }
+.composer-actions button { margin: 0; width: auto; padding: 9px 22px; }
+.composer-hint { font-size: 12.5px; color: var(--muted); }
+
+/* Groups, events, links */
+.group-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 16px; }
+.group-card { display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); transition: border-color .15s ease, transform .15s ease; }
+.group-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+.group-card h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.group-card .person-meta { margin-top: 2px; }
+.group-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.event-row { display: flex; gap: 14px; align-items: center; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.event-row:hover { border-color: var(--primary); }
+.date-tile { flex-shrink: 0; width: 52px; padding: 7px 0 6px; text-align: center; border-radius: 11px; background: var(--primary-light); color: var(--primary-ink); line-height: 1; }
+.date-tile small { display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 3px; color: var(--primary-ink); }
+.date-tile b { display: block; font-family: var(--font-display); font-size: 21px; font-weight: 600; }
+.date-tile.soon { background: var(--accent-soft); color: var(--accent-ink); }
+.date-tile.soon small { color: var(--accent-ink); }
+
+/* ---------- App shell ---------- */
+.shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); min-height: 100vh; }
+.sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 20px 14px 16px; background: var(--side); color: var(--side-text); overflow-y: auto; z-index: 40; }
+.sb-brand { display: flex; align-items: center; gap: 11px; padding: 4px 10px 14px; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #fff; letter-spacing: -.01em; }
+.brand-mark { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; background: var(--accent); color: #3A2500; display: flex; align-items: center; justify-content: center; }
+.brand-mark svg { width: 19px; height: 19px; }
+.sb-section { font-size: 13px; font-weight: 600; color: var(--side-muted); padding: 16px 12px 6px; }
+.sb-link { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; border-radius: 10px; color: var(--side-text); font-size: 14.5px; font-weight: 500; position: relative; transition: background .15s ease, color .15s ease; }
+.sb-link svg { width: 18px; height: 18px; flex-shrink: 0; opacity: .8; }
+.sb-link:hover { background: var(--side-2); color: #fff; }
+.sb-link.active { background: var(--side-2); color: #fff; font-weight: 600; }
+.sb-link.active::before { content: ""; position: absolute; left: -14px; top: 9px; bottom: 9px; width: 4px; border-radius: 0 4px 4px 0; background: var(--accent); }
+.sb-link.active svg { opacity: 1; color: var(--accent); }
+.sb-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .09); display: flex; flex-direction: column; gap: 4px; }
+.sb-user { display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 12px; width: 100%; }
+.sb-user:hover { background: var(--side-2); }
+.sb-user .avatar { width: 36px; height: 36px; }
+.sb-user-name { display: block; font-weight: 600; font-size: 14px; color: #fff; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-user-sub { display: block; font-size: 12.5px; color: var(--side-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-user > span:last-child { min-width: 0; }
+.sb-link.logout:hover { background: rgba(255, 132, 102, .14); color: #FFB3A0; }
+
+.main-col { min-width: 0; display: flex; flex-direction: column; }
+.topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px; padding: 12px 32px; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.page-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; letter-spacing: -.01em; margin: 0 auto 0 0; }
+.cmdk-btn { display: flex; align-items: center; gap: 10px; width: 290px; padding: 8px 10px 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-size: 14px; }
+.cmdk-btn:hover { background: var(--surface); border-color: var(--primary); color: var(--text); }
+.cmdk-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.cmdk-btn span { flex: 1; text-align: left; }
+kbd { font-family: var(--font-body); font-size: 11.5px; font-weight: 600; padding: 2px 6px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); }
+.top-icon { position: relative; width: 38px; height: 38px; padding: 0; margin: 0; display: inline-flex; align-items: center; justify-content: center; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 10px; }
+.top-icon:hover { background: var(--surface); border-color: var(--primary); color: var(--primary-ink); }
+.top-icon svg { width: 18px; height: 18px; }
+.badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #3A2500; font-size: 11px; font-weight: 700; border-radius: 9px; border: 2px solid var(--bg); }
+.menu-btn { display: none; }
+.container { width: 100%; max-width: 1180px; margin: 28px auto 72px; padding: 0 32px; }
+#app-main > div:not(#view-dashboard) { max-width: 880px; margin-inline: auto; }
+.scrim { display: none; }
+
+/* ---------- Dashboard ---------- */
+.dash-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.greet { font-family: var(--font-display); font-size: 32px; font-weight: 600; letter-spacing: -.025em; line-height: 1.1; margin: 0; }
+.dash-sub { color: var(--muted); margin: 6px 0 0; font-size: 15px; }
+.dash-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { margin: 0; width: auto; display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font-size: 13.5px; font-weight: 500; }
+.chip:hover { background: var(--surface); border-color: var(--primary); }
+.chip b { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--primary-ink); }
+.dash-grid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); gap: 20px; align-items: start; }
+.dash-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.side-card { padding: 18px 18px 14px; }
+.side-card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.side-card-head h2 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.side-card-head .link-btn { font-size: 13px; }
+.mini-list { display: flex; flex-direction: column; gap: 2px; }
+.mini-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-radius: 10px; }
+.mini-row:hover { background: var(--surface-2); }
+.mini-row .grow { flex: 1; min-width: 0; }
+.mini-row .person-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini-empty { color: var(--muted); font-size: 14px; padding: 10px 6px 14px; margin: 0; }
+
+.net-card { padding: 0; overflow: hidden; }
+.net-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; padding: 20px 22px 14px; }
+.net-head h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.015em; }
+.net-head p { margin: 4px 0 0; font-size: 14px; color: var(--muted); max-width: 46ch; }
+.toggle { display: inline-flex; align-items: center; gap: 9px; margin: 0; width: auto; padding: 6px 12px 6px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; font-size: 13px; font-weight: 500; }
+.toggle:hover { background: var(--surface-2); border-color: var(--primary); }
+.toggle .track { width: 30px; height: 18px; border-radius: 9px; background: var(--border); position: relative; transition: background .2s ease; }
+.toggle .track::after { content: ""; position: absolute; left: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .2s ease; }
+.toggle[aria-pressed="true"] .track { background: var(--primary); }
+.toggle[aria-pressed="true"] .track::after { transform: translateX(12px); }
+.net-stage { position: relative; height: 440px; background: var(--net-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); touch-action: pan-y; }
+#net-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: default; }
+.net-tip { position: absolute; z-index: 3; pointer-events: none; min-width: 150px; max-width: 230px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-hover); font-size: 13px; line-height: 1.35; opacity: 0; transform: translateY(4px); transition: opacity .12s ease, transform .12s ease; }
+.net-tip.on { opacity: 1; transform: none; }
+.net-tip b { display: block; font-size: 14px; }
+.net-tip span { color: var(--muted); }
+.net-legend { position: absolute; left: 14px; bottom: 12px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); pointer-events: none; }
+.net-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.net-empty { position: absolute; inset: auto 0 22% 0; margin: 0 auto; width: min(320px, 86%); text-align: center; z-index: 2; }
+.net-empty p { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+.net-empty .small-btn { margin-top: 0; }
+.net-info { padding: 14px 22px 18px; display: flex; flex-direction: column; gap: 12px; min-height: 108px; }
+.net-readout { font-size: 14px; color: var(--muted); min-height: 30px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.net-readout .path { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--text); }
+.net-readout .path span.node { padding: 3px 10px; border-radius: 999px; background: var(--primary-light); color: var(--primary-ink); font-weight: 600; font-size: 13px; }
+.net-readout .path span.node.me { background: var(--accent-soft); color: var(--accent-ink); }
+.net-readout .path svg { width: 14px; height: 14px; color: var(--muted); }
+.net-readout .small-btn { margin-left: auto; }
+.circle-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+.circle-chip { margin: 0; width: auto; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; font-size: 13px; font-weight: 500; }
+.circle-chip:hover, .circle-chip.on { background: var(--primary-light); border-color: var(--primary); color: var(--primary-ink); }
+.circle-chip .avatar { width: 26px; height: 26px; font-size: 10.5px; }
+
+.trend-card { padding: 20px 22px; }
+.trend-card .post-content { margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.trend-meta { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 13px; flex-wrap: wrap; }
+.trend-meta svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+.trend-meta .link-btn { margin-left: auto; font-size: 13px; }
+
+/* ---------- Command palette ---------- */
+.cmdk-overlay { position: fixed; inset: 0; z-index: 1500; display: none; align-items: flex-start; justify-content: center; padding: 13vh 16px 16px; background: rgba(5, 14, 10, .55); backdrop-filter: blur(3px); }
+.cmdk-overlay.open { display: flex; }
+.cmdk { width: min(580px, 100%); max-height: 70vh; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 30px 80px rgba(0, 0, 0, .4); overflow: hidden; }
+.cmdk-input-row { display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--border); }
+.cmdk-input-row svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+.cmdk-input-row input { border: 0; background: transparent; padding: 16px 0; font-size: 16px; box-shadow: none; border-radius: 0; }
+.cmdk-input-row input:focus { border: 0; box-shadow: none; background: transparent; }
+.cmdk-list { overflow-y: auto; padding: 8px; }
+.cmdk-group { font-size: 12.5px; font-weight: 600; color: var(--muted); padding: 10px 10px 4px; }
+.cmdk-item { display: flex; align-items: center; gap: 12px; width: 100%; margin: 0; padding: 9px 10px; border-radius: 10px; background: transparent; color: var(--text); font-size: 14.5px; font-weight: 500; text-align: left; }
+.cmdk-item svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+.cmdk-item small { margin-left: auto; color: var(--muted); font-size: 12.5px; font-weight: 500; }
+.cmdk-item.sel, .cmdk-item:hover { background: var(--primary-light); color: var(--primary-ink); }
+.cmdk-item.sel svg { color: var(--primary-ink); }
+.cmdk-foot { display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted); }
+.cmdk-empty { padding: 26px; text-align: center; color: var(--muted); font-size: 14px; }
+
+/* ---------- Auth ---------- */
+.auth-shell { min-height: 100vh; display: flex; }
+.auth-hero { flex: 1.1; background: var(--side); color: #fff; padding: 56px 56px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+.auth-constellation { position: absolute; right: -40px; bottom: -30px; width: min(560px, 90%); color: var(--accent); opacity: .9; pointer-events: none; }
+.auth-constellation line { stroke: rgba(255, 255, 255, .16); stroke-width: 1.4; }
+.auth-constellation circle { fill: #3FBF92; }
+.auth-constellation circle.you { fill: var(--accent); }
+.auth-constellation circle.far { fill: #7FA0B5; }
+.auth-hero-content { position: relative; z-index: 1; max-width: 460px; }
+.auth-hero .logo-mark { font-family: var(--font-display); font-size: 21px; font-weight: 700; display: flex; align-items: center; gap: 11px; margin-bottom: 44px; }
+.auth-hero .logo-mark svg { width: 20px; height: 20px; }
+.auth-hero h2 { font-size: 44px; font-weight: 600; line-height: 1.04; letter-spacing: -.03em; margin: 0 0 16px; }
+.auth-hero p { font-size: 16px; line-height: 1.6; color: rgba(255, 255, 255, .78); margin: 0; }
+.auth-hero-features { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
+.auth-hero-feature { display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: rgba(255, 255, 255, .9); }
+.auth-hero-feature .icon-badge { width: 32px; height: 32px; border-radius: 9px; background: rgba(255, 255, 255, .1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent); }
+.auth-hero-feature .icon-badge svg { width: 16px; height: 16px; }
+.auth-form-side { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; background: var(--bg); }
+.auth-form-side .card { width: 100%; max-width: 420px; padding: 32px; }
+.auth-form-side h1 { font-size: 26px; letter-spacing: -.02em; }
+
+/* ---------- Games ---------- */
+.ttt-board { display: grid; grid-template-columns: repeat(3, 92px); grid-template-rows: repeat(3, 92px); gap: 8px; margin-top: 16px; }
+.ttt-cell { background: var(--surface-2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 600; font-family: var(--font-display); cursor: pointer; user-select: none; transition: background .12s ease, border-color .12s ease; }
+.ttt-cell:hover { background: var(--primary-light); border-color: var(--primary); }
+.ttt-cell.x { color: var(--primary-ink); }
+.ttt-cell.o { color: var(--accent); }
+.ttt-cell.win { background: var(--accent-soft); border-color: var(--accent); }
+.puzzle-board { display: grid; grid-template-columns: repeat(3, 92px); grid-template-rows: repeat(3, 92px); gap: 8px; margin-top: 16px; }
+.puzzle-cell { background: var(--primary); color: #fff; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 600; font-family: var(--font-display); cursor: pointer; user-select: none; transition: transform .12s ease, background .12s ease; }
+.puzzle-cell:hover { background: var(--primary-dark); transform: translateY(-2px); }
+.puzzle-cell.blank { background: var(--surface-2); box-shadow: inset 0 0 0 1.5px var(--border); cursor: default; transform: none; }
+.search-row { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
+#search-input { margin-bottom: 16px; }
+
+/* ---------- Chat ---------- */
+.chat-shell { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 140px); min-height: 460px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.chat-side { display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--border); }
+.chat-side-head { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.chat-side-head h1 { margin: 0; font-size: 18px; }
+.chat-convs { flex: 1; overflow-y: auto; }
+.conv-item { display: flex; align-items: center; gap: 12px; width: 100%; margin: 0; padding: 12px 16px; background: transparent; color: var(--text); border: 0; border-bottom: 1px solid var(--border); border-radius: 0; text-align: left; font-weight: 500; }
+.conv-item:hover { background: var(--surface-2); }
+.conv-item.active { background: var(--primary-light); }
+.conv-item .conv-text { flex: 1; min-width: 0; }
+.conv-item .conv-name { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-item .conv-last { font-size: 13px; color: var(--muted); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-item.unread .conv-last { color: var(--text); font-weight: 600; }
+.conv-dot { min-width: 20px; height: 20px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--accent); color: #3A2500; font-size: 11.5px; font-weight: 700; }
+.chat-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.chat-head { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+.chat-head .person-name { font-size: 15px; }
+.chat-back { display: none; }
+.chat-log { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); }
+.chat-empty { margin: auto; text-align: center; color: var(--muted); font-size: 14px; max-width: 280px; }
+.msg { max-width: min(520px, 78%); padding: 8px 12px; border-radius: 14px; font-size: 14.5px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.theirs { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.msg.mine { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+.msg small { display: block; margin-top: 3px; font-size: 11px; opacity: .7; text-align: right; }
+.msg-day { align-self: center; margin: 8px 0 2px; font-size: 12px; color: var(--muted); }
+.chat-starters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+.chat-form { display: flex; gap: 10px; align-items: flex-end; padding: 12px 84px 12px 14px; border-top: 1px solid var(--border); background: var(--surface); }
+.chat-form textarea { flex: 1; min-height: 42px; max-height: 120px; resize: none; margin: 0; }
+.chat-form .small-btn { height: 42px; padding: 0 18px; }
+.chat-flash { margin: 0 14px 10px; }
+.chat-placeholder { margin: auto; text-align: center; color: var(--muted); padding: 24px; }
+.chat-placeholder svg { width: 40px; height: 40px; opacity: .5; }
+.sb-badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--accent); color: #3A2500; font-size: 11.5px; font-weight: 700; }
+@media (max-width: 760px) {
+    .chat-shell { grid-template-columns: 1fr; height: calc(100vh - 110px); }
+    .chat-shell .chat-main { display: none; }
+    .chat-shell.in-thread .chat-side { display: none; }
+    .chat-shell.in-thread .chat-main { display: flex; }
+    .chat-back { display: inline-flex; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } }
+@media (max-width: 960px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: fixed; left: 0; top: 0; width: 270px; transform: translateX(-102%); transition: transform .22s ease; }
+    .shell.nav-open .sidebar { transform: none; box-shadow: 10px 0 40px rgba(0, 0, 0, .35); }
+    .shell.nav-open .scrim { display: block; position: fixed; inset: 0; z-index: 35; background: rgba(5, 14, 10, .5); }
+    .menu-btn { display: inline-flex; }
+    .topbar { padding: 10px 16px; }
+    .container { padding: 0 16px; margin-top: 20px; }
+    .cmdk-btn { width: 38px; height: 38px; padding: 0; justify-content: center; flex-shrink: 0; }
+    .auth-constellation { width: 340px; right: -70px; bottom: -40px; opacity: .3; }
+    .cmdk-btn span, .cmdk-btn kbd { display: none; }
+    .page-title { font-size: 18px; }
+    .greet { font-size: 26px; }
+    .auth-shell { flex-direction: column; }
+    .auth-hero { padding: 40px 28px 56px; }
+    .auth-hero h2 { font-size: 34px; }
+}
+@media (max-width: 560px) {
+    .net-stage { height: 380px; }
+    .ttt-board, .puzzle-board { grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(3, 80px); }
+    .person-row { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* ===== Campus pet ===== */
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--side); color: #fff; padding: 12px 18px; border-radius: 12px; box-shadow: var(--shadow-hover); font-size: 14px; max-width: min(520px, calc(100vw - 32px)); opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 1200; }
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { background: #B8381A; }
+#pet-root { position: fixed; right: 18px; bottom: 18px; z-index: 1100; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; font-family: var(--font-body); }
+#pet-root[hidden] { display: none; }
+.pet-btn { width: 88px; height: 88px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; filter: drop-shadow(0 6px 10px rgba(31,34,51,.22)); transition: transform .15s ease; }
+.pet-btn:hover { transform: scale(1.06) rotate(-2deg); }
+.pet-btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.pet-btn svg { width: 100%; height: 100%; overflow: visible; }
+.pet-bob { animation: pet-bob 3.2s ease-in-out infinite; transform-origin: 50% 90%; }
+.pet-tail { animation: pet-tail 2.4s ease-in-out infinite; transform-origin: 84px 96px; }
+.pet-eye { animation: pet-blink 5s infinite; transform-origin: center; transform-box: fill-box; }
+.pet-ear-l, .pet-ear-r { transform-box: fill-box; transform-origin: 50% 100%; }
+#pet-root.thinking .pet-ear-l { animation: pet-ear 0.5s ease-in-out infinite; }
+#pet-root.thinking .pet-ear-r { animation: pet-ear 0.5s ease-in-out infinite .25s; }
+#pet-root.happy .pet-bob { animation: pet-hop .5s ease-out 2; }
+@keyframes pet-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes pet-hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-12px); } }
+@keyframes pet-tail { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(14deg); } }
+@keyframes pet-blink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes pet-ear { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-9deg); } }
+.pet-bubble { position: relative; max-width: 250px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px 16px 4px 16px; padding: 11px 14px; font-size: 13.5px; line-height: 1.4; box-shadow: var(--shadow-hover); animation: pet-pop .25s ease-out; cursor: pointer; }
+.pet-bubble[hidden] { display: none; }
+@keyframes pet-pop { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: none; } }
+.pet-panel { width: min(360px, calc(100vw - 28px)); height: min(480px, calc(100vh - 150px)); background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 14px 40px rgba(31,34,51,.22); display: flex; flex-direction: column; overflow: hidden; animation: pet-pop .2s ease-out; }
+.pet-panel[hidden] { display: none; }
+.pet-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; }
+.pet-head-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; flex: 1; min-width: 0; }
+.pet-head-title small { display: block; font-family: var(--font-body); font-weight: 500; font-size: 11px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pet-head button { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; width: auto; margin: 0; flex-shrink: 0; white-space: nowrap; box-shadow: none; }
+.pet-head button:hover { background: rgba(255,255,255,.28); }
+.pet-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+.pet-msg { max-width: 86%; padding: 9px 12px; border-radius: 14px; font-size: 13.5px; line-height: 1.42; white-space: pre-wrap; word-wrap: break-word; }
+.pet-msg.pet { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.pet-msg.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+.pet-msg.typing { color: var(--muted); font-style: italic; }
+.pet-go { align-self: flex-start; background: var(--primary-light); color: var(--primary-dark); border: 0; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.pet-go:hover { background: var(--primary-soft-hover); }
+.pet-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px 0; background: var(--surface); }
+.pet-chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
+.pet-chip:hover { border-color: var(--primary); color: var(--primary-dark); }
+.pet-form { display: flex; gap: 8px; padding: 10px 12px 12px; background: var(--surface); }
+.pet-form input { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; padding: 9px 12px; font-size: 13.5px; }
+.pet-form button { flex: 0 0 auto; width: auto; margin: 0; padding: 9px 16px; border-radius: 10px; font-size: 13px; }
+.pet-chip, .pet-go { width: auto; margin: 0; box-shadow: none; }
+.pet-form input:disabled, .pet-form button:disabled { opacity: .55; cursor: not-allowed; }
+@media (max-width: 520px) { .pet-btn { width: 68px; height: 68px; } #pet-root { right: 10px; bottom: 10px; } }
+@media (prefers-reduced-motion: reduce) { .pet-bob, .pet-tail, .pet-eye, .pet-ear-l, .pet-ear-r, .pet-bubble, .pet-panel { animation: none !important; } }
+
+
+.like-btn.liked:hover { background: var(--accent-soft); color: var(--accent-ink); }
+.group-grid .empty-state { grid-column: 1 / -1; }
+.grow { flex: 1; min-width: 0; }
+.cmdk-btn { margin: 0; }
+
+/* ---- Posters / images, saved posts ---- */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+.composer-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+.composer-actions .attach-btn, .attach-btn { margin: 0; width: auto; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; background: var(--surface-2); color: var(--primary-dark); border: 1px solid var(--border); border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: none; }
+.composer-actions .attach-btn:hover, .attach-btn:hover { background: var(--primary-light); border-color: var(--primary); transform: none; box-shadow: none; }
+.attach-btn svg { width: 17px; height: 17px; }
+.attach-preview { position: relative; margin-top: 10px; display: inline-block; max-width: 100%; }
+.attach-preview[hidden] { display: none; }
+.attach-preview img { display: block; max-width: min(100%, 360px); max-height: 220px; border-radius: 12px; border: 1px solid var(--border); }
+.attach-preview .remove { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; margin: 0; padding: 0; border-radius: 50%; background: rgba(10, 20, 17, .78); color: #fff; font-size: 16px; line-height: 1; box-shadow: none; }
+.attach-preview .remove:hover { background: #000; transform: none; box-shadow: none; }
+.attach-preview .size { position: absolute; left: 8px; bottom: 8px; background: rgba(10, 20, 17, .78); color: #fff; font-size: 11.5px; padding: 2px 8px; border-radius: 6px; }
+.post-image { display: block; width: 100%; max-height: 460px; object-fit: contain; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; margin: 0 0 14px; cursor: zoom-in; }
+.video-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.video-row[hidden] { display: none; }
+.video-row input { flex: 1; margin: 0; }
+.video-clear { margin: 0; width: 34px; height: 34px; padding: 0; flex-shrink: 0; border-radius: 50%; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); font-size: 18px; line-height: 1; box-shadow: none; }
+.video-clear:hover { background: var(--error-bg); color: var(--error); transform: none; box-shadow: none; }
+.post-video { margin: 0 0 14px; border-radius: 12px; overflow: hidden; background: #0d1412; }
+.post-video .reel-yt { max-width: 100%; }
+.post-video-title { font-size: 12.5px; color: var(--muted); margin: -8px 0 12px; }
+.event-poster { max-height: 300px; margin: 10px 0 0; }
+.post-actions .small-btn.saved { background: var(--accent); color: #2b1b00; }
+.post-actions .small-btn.saved svg { fill: currentColor; }
+.post-actions .push { margin-left: auto; }
+.like-btn.pop svg { animation: likepop .45s ease-out; }
+@keyframes likepop { 0% { transform: scale(1); } 40% { transform: scale(1.5) rotate(-8deg); } 100% { transform: scale(1); } }
+.lightbox { position: fixed; inset: 0; z-index: 3000; background: rgba(5, 12, 10, .88); display: none; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); background: #fff; }
+.lightbox button { position: absolute; top: 16px; right: 18px; width: 40px; height: 40px; margin: 0; padding: 0; border-radius: 50%; background: rgba(255, 255, 255, .14); font-size: 22px; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .like-btn.pop svg { animation: none; } }
+</style>
+</head>
+<body>
+
+
+<!-- ============== CAMPUS PET ============== -->
+<div id="pet-root" hidden>
+    <div class="pet-panel" id="pet-panel" role="dialog" aria-label="Chat with the campus pet" hidden>
+        <div class="pet-head">
+            <div class="pet-head-title"><span id="pet-title">Mochi</span><small id="pet-subtitle">Your campus guide</small></div>
+            <button type="button" id="pet-tips-toggle" title="Show or hide the little tips I pop up">Tips: on</button>
+            <button type="button" id="pet-close" aria-label="Close chat">&times;</button>
+        </div>
+        <div class="pet-log" id="pet-log" aria-live="polite"></div>
+        <div class="pet-chips" id="pet-chips"></div>
+        <form class="pet-form" id="pet-form">
+            <input type="text" id="pet-input" maxlength="500" placeholder="Ask about the site or your studies..." autocomplete="off">
+            <button type="submit" id="pet-send">Send</button>
+        </form>
+    </div>
+    <div class="pet-bubble" id="pet-bubble" hidden></div>
+    <button type="button" class="pet-btn" id="pet-btn" aria-label="Open the campus pet guide">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+            <g class="pet-bob">
+                <g class="pet-tail"><path d="M84 96 C108 96 112 68 100 60" fill="none" stroke="#F4B26B" stroke-width="9" stroke-linecap="round"/><path d="M100 60 C97 57 96 55 96 52" fill="none" stroke="#7A5A3A" stroke-width="9" stroke-linecap="round"/></g>
+                <ellipse cx="60" cy="94" rx="30" ry="21" fill="#FFD9A0"/>
+                <ellipse cx="60" cy="100" rx="17" ry="12" fill="#FFF3DE"/>
+                <ellipse cx="44" cy="111" rx="9" ry="6" fill="#FFF3DE"/><ellipse cx="76" cy="111" rx="9" ry="6" fill="#FFF3DE"/>
+                <g class="pet-ear-l"><path d="M25 48 L30 17 L50 36 Z" fill="#FFD9A0"/><path d="M31 41 L33 26 L43 36 Z" fill="#FF9DB2"/></g>
+                <g class="pet-ear-r"><path d="M95 48 L90 17 L70 36 Z" fill="#FFD9A0"/><path d="M89 41 L87 26 L77 36 Z" fill="#FF9DB2"/></g>
+                <ellipse cx="60" cy="58" rx="38" ry="31" fill="#FFD9A0"/>
+                <path d="M40 38 C46 32 52 31 56 32 C52 38 46 42 40 44 Z" fill="#F4B26B"/>
+                <g class="pet-eye"><ellipse cx="45" cy="60" rx="5.2" ry="6.4" fill="#2B2438"/><circle cx="46.8" cy="57.8" r="1.9" fill="#fff"/></g>
+                <g class="pet-eye"><ellipse cx="75" cy="60" rx="5.2" ry="6.4" fill="#2B2438"/><circle cx="76.8" cy="57.8" r="1.9" fill="#fff"/></g>
+                <ellipse cx="36" cy="70" rx="6" ry="3.6" fill="#FF9DB2" opacity=".6"/><ellipse cx="84" cy="70" rx="6" ry="3.6" fill="#FF9DB2" opacity=".6"/>
+                <path d="M57 68 L63 68 L60 72 Z" fill="#E4577A"/>
+                <path d="M60 72 C60 77 54 78 52 75 M60 72 C60 77 66 78 68 75" fill="none" stroke="#2B2438" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M26 66 L14 63 M26 71 L13 72 M94 66 L106 63 M94 71 L107 72" stroke="#B88A5A" stroke-width="1.5" stroke-linecap="round"/>
+                <g><path d="M34 30 L60 19 L86 30 L60 41 Z" fill="#1E2350"/><path d="M45 36 L45 45 C52 49 68 49 75 45 L75 36 L60 41 Z" fill="#2E3580"/><path d="M86 30 L86 43" stroke="#FF7A59" stroke-width="2" stroke-linecap="round"/><circle cx="86" cy="45" r="2.6" fill="#FF7A59"/></g>
+            </g>
+        </svg>
+    </button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============== AUTH (login / register) ============== -->
+<div id="view-auth" class="auth-shell">
+    <div class="auth-hero">
+        <svg class="auth-constellation" viewBox="0 0 560 360" aria-hidden="true">
+            <line x1="300" y1="190" x2="170" y2="110"/><line x1="300" y1="190" x2="430" y2="120"/><line x1="300" y1="190" x2="380" y2="290"/><line x1="300" y1="190" x2="190" y2="270"/>
+            <line x1="170" y1="110" x2="80" y2="170"/><line x1="170" y1="110" x2="210" y2="30"/><line x1="430" y1="120" x2="510" y2="60"/><line x1="430" y1="120" x2="520" y2="210"/>
+            <line x1="380" y1="290" x2="470" y2="330"/><line x1="190" y1="270" x2="90" y2="310"/><line x1="190" y1="270" x2="80" y2="170"/>
+            <circle class="far" cx="80" cy="170" r="7"/><circle class="far" cx="210" cy="30" r="6"/><circle class="far" cx="510" cy="60" r="7"/><circle class="far" cx="520" cy="210" r="6"/><circle class="far" cx="470" cy="330" r="7"/><circle class="far" cx="90" cy="310" r="6"/>
+            <circle cx="170" cy="110" r="11"/><circle cx="430" cy="120" r="12"/><circle cx="380" cy="290" r="11"/><circle cx="190" cy="270" r="12"/>
+            <circle class="you" cx="300" cy="190" r="17"/>
+        </svg>
+        <div class="auth-hero-content">
+            <div class="logo-mark" id="hero-logo"></div>
+            <h2>Study better with people you know.</h2>
+            <p>A private network for verified college students. Ask doubts, join study groups, share notes and see how your classmates connect.</p>
+            <div class="auth-hero-features" id="hero-features"></div>
+        </div>
+    </div>
+    <div class="auth-form-side">
+        <div class="card form-card">
+            <div id="login-form-wrap">
+                <h1>Welcome back</h1>
+                <p class="subtitle">Log in with your college email.</p>
+                <div id="login-flash" class="flash"></div>
+                <form id="login-form">
+                    <label for="login-email">College email</label>
+                    <input type="email" id="login-email" placeholder="you@college.edu" required>
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                    <button type="submit">Log in</button>
+                </form>
+                <p class="switch-link">New here? <a onclick="showAuthForm('register')">Create an account</a></p>
+                <p class="switch-link" id="resend-wrap" style="display:none;"><button type="button" class="link-btn" onclick="onResendVerification()">Resend verification email</button></p>
+            </div>
+            <div id="register-form-wrap" style="display:none;">
+                <h1>Create your account</h1>
+                <p class="subtitle">Use your official college email — .edu, .ac.in, and most university domains work.</p>
+                <div id="register-flash" class="flash"></div>
+                <form id="register-form">
+                    <label for="reg-name">Full name</label>
+                    <input type="text" id="reg-name" placeholder="Jordan Lee" required>
+                    <label for="reg-college">College</label>
+                    <input type="text" id="reg-college" placeholder="Amrita Vishwa Vidyapeetham" required>
+                    <label for="reg-email">College email</label>
+                    <input type="email" id="reg-email" placeholder="you@college.edu" required>
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="At least 8 characters" minlength="8" required>
+                    <label for="reg-confirm">Confirm password</label>
+                    <input type="password" id="reg-confirm" placeholder="Re-enter password" minlength="8" required>
+                    <button type="submit">Sign up</button>
+                </form>
+                <p class="switch-link">Already have an account? <a onclick="showAuthForm('login')">Log in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============== APP (nav + views) ============== -->
+<div class="shell" id="app-shell" style="display:none;">
+<aside class="sidebar" id="app-nav" aria-label="Sidebar"></aside>
+<div class="scrim" onclick="closeSidebar()"></div>
+<div class="main-col">
+<header class="topbar" id="app-topbar"></header>
+<main class="container" id="app-main">
+
+    <div id="view-dashboard" style="display:none;">
+        <div class="dash-head">
+            <div>
+                <h2 class="greet" id="dash-welcome">Welcome</h2>
+                <p class="dash-sub" id="dash-college"></p>
+            </div>
+            <div class="dash-chips" id="dash-chips"></div>
+        </div>
+        <div class="dash-grid">
+            <div class="dash-col">
+                <section class="card net-card" aria-labelledby="net-title">
+                    <div class="net-head">
+                        <div>
+                            <h2 id="net-title">Your campus network</h2>
+                            <p> Drag a classmate, or click one to trace how you are connected.</p>
+                        </div>
+                        <button type="button" class="toggle" id="net-fof-toggle" aria-pressed="true"><span class="track"></span>Friends of friends</button>
+                    </div>
+                    <div class="net-stage" id="net-stage">
+                        <canvas id="net-canvas" role="img" aria-label="Friend network graph"></canvas>
+                        <div class="net-tip" id="net-tip"></div>
+                        <div class="net-legend"><span><i style="background:var(--accent)"></i>You</span><span><i style="background:var(--primary)"></i>Friends</span><span><i style="background:var(--net-fof)"></i>Friends of friends</span></div>
+                        <div class="net-empty" id="net-empty" hidden>
+                            <p>No friends yet. Add classmates and they will appear around you.</p>
+                            <button type="button" class="small-btn" onclick="showApp('friends')">Find classmates</button>
+                        </div>
+                    </div>
+                    <div class="net-info">
+                        <div class="net-readout" id="net-readout" aria-live="polite"></div>
+                        <div class="circle-row" id="circle-row"></div>
+                    </div>
+                </section>
+                <section class="card trend-card" id="trend-card"></section>
+            </div>
+            <div class="dash-col">
+                <section class="card side-card">
+                    <div class="side-card-head"><h2>Up next</h2><button type="button" class="link-btn" onclick="showApp('events')">All events</button></div>
+                    <div class="mini-list" id="dash-events"></div>
+                </section>
+                <section class="card side-card">
+                    <div class="side-card-head"><h2>People you may know</h2><button type="button" class="link-btn" onclick="showApp('friends')">Find more</button></div>
+                    <div class="mini-list" id="dash-suggestions"></div>
+                </section>
+                <section class="card side-card">
+                    <div class="side-card-head"><h2>Your groups</h2><button type="button" class="link-btn" onclick="showApp('groups')">Browse</button></div>
+                    <div class="mini-list" id="dash-groups"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-feed" style="display:none;">
+        <div class="card">
+            <div class="composer">
+                <span id="composer-avatar"></span>
+                <form id="composer-form">
+                    <div id="composer-flash" class="flash" style="margin:0 0 10px;"></div>
+                    <textarea id="post-content" rows="3" placeholder="Ask a doubt or share something you learned (education only)" maxlength="2000"></textarea>
+                    <input type="file" id="feed-image-input" class="visually-hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-key="feed" tabindex="-1" aria-label="Choose an image">
+                    <div class="attach-preview" id="feed-image-preview" hidden></div>
+                    <div class="video-row" id="feed-video-row" hidden><input type="url" id="feed-video-url" placeholder="Paste a YouTube link (lectures, tutorials, explainers)" aria-label="YouTube link"><button type="button" class="video-clear" data-clear="feed" aria-label="Remove video">&times;</button></div>
+                    <div class="composer-actions">
+                        <div class="composer-left"><button type="button" class="attach-btn" data-attach="feed" title="Add a poster, diagram or photo of your notes"><span>Add image</span></button><button type="button" class="attach-btn video-btn" data-video="feed" title="Share an educational YouTube video"><span>Add video</span></button><span class="composer-hint">Education only. Posts, images and videos are checked.</span></div>
+                        <button type="submit">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon" id="icon-feed"></span><h1>Campus feed</h1></div>
+            <div class="feed-tabs" style="margin-top:18px;">
+                <button type="button" class="tab-btn active" data-tab="recent" onclick="setFeedTab('recent')">Recent</button>
+                <button type="button" class="tab-btn" data-tab="trending" onclick="setFeedTab('trending')">Trending</button>
+                <button type="button" class="tab-btn" data-tab="saved" onclick="setFeedTab('saved')">Saved</button>
+            </div>
+            <div id="posts-flash" class="flash"></div>
+            <div id="posts-list" class="list"></div>
+        </div>
+    </div>
+
+    <div id="view-friends" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon" id="icon-search"></span><h1>Find students</h1></div>
+            <div id="search-flash" class="flash"></div>
+            <input type="text" id="search-input" placeholder="Search by name, college, or email handle..." style="margin-top:16px;">
+            <div id="search-results" class="list"></div>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon gold" id="icon-suggestions"></span><h1>People you may know</h1></div>
+            <p class="subtitle">Friends of friends, ranked by how many friends you share.</p>
+            <div id="suggestions-list" class="list" style="margin-top:12px;"></div>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon" id="icon-requests"></span><h1>Pending requests</h1></div>
+            <div id="requests-flash" class="flash"></div>
+            <h2 class="section-label">Incoming</h2>
+            <div id="incoming-list" class="list"></div>
+            <h2 class="section-label">Sent</h2>
+            <div id="outgoing-list" class="list"></div>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon" id="icon-friends-list"></span><h1>Your friends</h1></div>
+            <div id="friends-list" class="list" style="margin-top:16px;"></div>
+        </div>
+    </div>
+
+    <div id="view-profile" style="display:none;">
+        <div class="card form-card">
+            <div class="section-title"><span class="title-icon gold" id="icon-profile"></span><h1 id="profile-name">Loading...</h1></div>
+            <p class="subtitle" id="profile-email-college"></p>
+            <div id="profile-flash" class="flash"></div>
+            <form id="profile-form">
+                <label for="profile-bio">Bio</label>
+                <textarea id="profile-bio" rows="3"></textarea>
+                <label for="profile-major">Major</label>
+                <input type="text" id="profile-major">
+                <label for="profile-year">Year</label>
+                <input type="text" id="profile-year">
+                <label for="profile-interests">Interests</label>
+                <input type="text" id="profile-interests" placeholder="subjects & skills, comma-separated">
+                <button type="submit">Save changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="view-groups" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon gold" id="icon-group-create"></span><h1>Start a discussion group</h1></div>
+            <div id="create-group-flash" class="flash"></div>
+            <form id="create-group-form">
+                <label for="group-name">Group name</label>
+                <input type="text" id="group-name" required>
+                <label for="group-topic">Topic</label>
+                <input type="text" id="group-topic" placeholder="e.g. Data Structures, Placement Prep" required>
+                <button type="submit">Create group</button>
+            </form>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon" id="icon-group-list"></span><h1>Academic groups</h1></div>
+            <div id="groups-flash" class="flash"></div>
+            <input type="text" id="group-search" placeholder="Search groups by name or topic..." style="margin-top:16px;">
+            <div id="groups-list" class="group-grid"></div>
+        </div>
+    </div>
+
+    <div id="view-group" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon" id="icon-group-detail"></span><h1 id="group-detail-name">Loading...</h1></div>
+            <p class="subtitle" id="group-detail-meta"></p>
+            <div id="group-detail-flash" class="flash"></div>
+            <div class="person-actions">
+                <button type="button" class="small-btn danger" id="leave-group-btn" onclick="leaveCurrentGroup()">Leave group</button>
+                <button type="button" class="small-btn" id="join-group-btn" onclick="joinCurrentGroup()" style="display:none;">Join group</button>
+                <button type="button" class="small-btn" onclick="showApp('groups')">Back to groups</button>
+            </div>
+        </div>
+        <div class="card" id="group-composer-card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon accent" id="icon-group-post"></span><h1>Post to this group</h1></div>
+            <div id="group-composer-flash" class="flash"></div>
+            <form id="group-composer-form">
+                <textarea id="group-post-content" rows="3" placeholder="Share a study resource, doubt, or academic announcement (education only)..." maxlength="2000"></textarea>
+                <input type="file" id="group-image-input" class="visually-hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-key="group" tabindex="-1" aria-label="Choose an image">
+                <div class="attach-preview" id="group-image-preview" hidden></div>
+                <div class="video-row" id="group-video-row" hidden><input type="url" id="group-video-url" placeholder="Paste a YouTube link (lectures, tutorials, explainers)" aria-label="YouTube link"><button type="button" class="video-clear" data-clear="group" aria-label="Remove video">&times;</button></div>
+                <div class="composer-actions">
+                    <div class="composer-left"><button type="button" class="attach-btn" data-attach="group" title="Add a poster, diagram or photo of your notes"><span>Add image</span></button><button type="button" class="attach-btn video-btn" data-video="group" title="Share an educational YouTube video"><span>Add video</span></button></div>
+                    <button type="submit">Post</button>
+                </div>
+            </form>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <h1>Group posts</h1>
+            <div id="group-posts-list" class="list"></div>
+        </div>
+    </div>
+
+    <div id="view-events" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon" id="icon-event-create"></span><h1>Announce an event</h1></div>
+            <div id="create-event-flash" class="flash"></div>
+            <form id="create-event-form">
+                <label for="event-title">Title</label>
+                <input type="text" id="event-title" required>
+                <label for="event-date">Date</label>
+                <input type="date" id="event-date" required>
+                <label for="event-description">Description</label>
+                <textarea id="event-description" rows="3"></textarea>
+                <input type="file" id="event-image-input" class="visually-hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-key="event" tabindex="-1" aria-label="Choose a poster">
+                <div class="attach-preview" id="event-image-preview" hidden></div>
+                <div class="composer-actions">
+                    <div class="composer-left"><button type="button" class="attach-btn" data-attach="event" title="Add the event poster"><span>Add poster</span></button></div>
+                    <button type="submit">Create event</button>
+                </div>
+            </form>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon" id="icon-event-list"></span><h1>Upcoming events</h1></div>
+            <div class="feed-tabs" style="margin-top:18px;">
+                <button type="button" class="tab-btn active" data-scope="college" onclick="setEventScope('college')">My college</button>
+                <button type="button" class="tab-btn" data-scope="all" onclick="setEventScope('all')">All colleges</button>
+            </div>
+            <div id="events-flash" class="flash"></div>
+            <div id="events-list" class="list"></div>
+        </div>
+    </div>
+
+    <div id="view-resources" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon gold" id="icon-announce"></span><h1>Announcements</h1></div>
+            <p class="subtitle">Visible to students at your college.</p>
+            <div id="create-announcement-flash" class="flash"></div>
+            <form id="create-announcement-form">
+                <label for="announcement-title">Title</label>
+                <input type="text" id="announcement-title" maxlength="120" required>
+                <label for="announcement-body">Message</label>
+                <textarea id="announcement-body" rows="3" maxlength="2000" required></textarea>
+                <button type="submit">Post announcement</button>
+            </form>
+            <div id="announcements-list" class="list" style="margin-top:16px;"></div>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon accent" id="icon-resource-create"></span><h1>Share a resource</h1></div>
+            <div id="create-resource-flash" class="flash"></div>
+            <form id="create-resource-form">
+                <label for="resource-title">Title</label>
+                <input type="text" id="resource-title" required>
+                <label for="resource-url">Link</label>
+                <input type="url" id="resource-url" placeholder="https://..." required>
+                <label for="resource-description">Description (optional)</label>
+                <textarea id="resource-description" rows="2"></textarea>
+                <button type="submit">Share link</button>
+            </form>
+        </div>
+        <div class="card" style="margin-top:24px;">
+            <div class="section-title"><span class="title-icon" id="icon-resource-list"></span><h1>Shared links</h1></div>
+            <div id="resources-flash" class="flash"></div>
+            <div id="resources-list" class="list"></div>
+        </div>
+    </div>
+
+    <div id="view-reels" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon accent" id="icon-reels"></span><h1>Reels</h1></div>
+            <p class="subtitle">Short animated explainers made for this app, open-licensed lectures, and videos from classmates.</p>
+            <div class="reel-tabs feed-tabs" id="reel-tabs">
+                <button type="button" class="tab-btn active" data-tab="reels">All</button>
+                <button type="button" class="tab-btn" data-tab="prebuilt">Pre-built</button>
+                <button type="button" class="tab-btn" data-tab="open">Open lectures</button>
+                <button type="button" class="tab-btn" data-tab="community">Community</button>
+                <button type="button" class="tab-btn" data-tab="reference">Reference</button>
+            </div>
+            <div class="reels-toolbar" id="reels-filters">
+                <select id="reel-topic" aria-label="Filter by topic"><option value="">All topics</option></select>
+                <select id="reel-sort" aria-label="Sort reels">
+                    <option value="curated">Curated order</option><option value="top">Most liked</option><option value="new">Newest</option>
+                </select>
+                <span class="spacer"></span>
+                <button type="button" class="small-btn" id="reel-share-toggle">+ Share a video</button>
+            </div>
+            <div class="reel-form-wrap" id="reel-form-wrap" hidden>
+                <div id="reel-new-flash" class="flash"></div>
+                <form id="reel-new-form">
+                    <label for="reel-new-url">YouTube link</label>
+                    <input type="url" id="reel-new-url" placeholder="https://www.youtube.com/watch?v=..." required>
+                    <p class="reel-hint">We embed the video from YouTube; nothing is copied. Share only videos you're allowed to share, and check the licence on the video page. Titles and descriptions go through our safety checks.</p>
+                    <div class="row">
+                        <div><label for="reel-new-title">Title</label><input type="text" id="reel-new-title" maxlength="100" required></div>
+                        <div><label for="reel-new-topic">Topic</label><select id="reel-new-topic"></select></div>
+                    </div>
+                    <label for="reel-new-desc">Why is it useful? (optional)</label>
+                    <textarea id="reel-new-desc" rows="2" maxlength="300"></textarea>
+                    <button type="submit">Share reel</button>
+                </form>
+            </div>
+            <div id="reels-feed-wrap"><div class="reel-feed" id="reels-feed" tabindex="0" aria-label="Reels feed. Scroll to see the next reel."></div></div>
+            <div id="reels-ref" style="display:none;"></div>
+        </div>
+    </div>
+    <div id="view-messages" style="display:none;">
+        <div class="chat-shell" id="chat-shell">
+            <section class="chat-side" aria-label="Conversations">
+                <div class="chat-side-head"><h1>Messages</h1><p class="subtitle">Chat with your friends.</p></div>
+                <div class="chat-convs" id="chat-convs"></div>
+            </section>
+            <section class="chat-main" id="chat-main" aria-label="Conversation">
+                <div class="chat-placeholder" id="chat-placeholder"></div>
+            </section>
+        </div>
+    </div>
+
+    <div id="view-notifications" style="display:none;">
+        <div class="card">
+            <div class="section-title"><span class="title-icon gold" id="icon-notifications"></span><h1>Notifications</h1></div>
+            <div id="notifications-flash" class="flash"></div>
+            <div id="notifications-list" class="list" style="margin-top:16px;"></div>
+        </div>
+    </div>
+
+    <div id="view-games" style="display:none;">
+        <div class="card">
+            <div class="feed-tabs">
+                <button type="button" class="tab-btn active" data-game="tictactoe" onclick="setGameTab('tictactoe')">Tic-Tac-Toe</button>
+                <button type="button" class="tab-btn" data-game="puzzle" onclick="setGameTab('puzzle')">Sliding Puzzle</button>
+            </div>
+            <div id="tictactoe-panel">
+                <div class="section-title"><span class="title-icon gold" id="icon-game-ttt"></span><h1>Tic-Tac-Toe (minimax)</h1></div>
+                <p class="subtitle" id="ttt-status">You are X. Beat the CPU.</p>
+                <div id="ttt-board" class="ttt-board"></div>
+                <button type="button" class="small-btn" onclick="resetTicTacToe()" style="margin-top:16px;">New game</button>
+            </div>
+            <div id="puzzle-panel" style="display:none;">
+                <div class="section-title" style="margin-top:18px;"><span class="title-icon gold" id="icon-game-puzzle"></span><h1>Sliding Puzzle</h1></div>
+                <p class="subtitle" id="puzzle-status">Arrange the tiles in order.</p>
+                <div id="puzzle-board" class="puzzle-board"></div>
+                <button type="button" class="small-btn" onclick="shufflePuzzle()" style="margin-top:16px;">Shuffle</button>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+</div>
+
+<div class="cmdk-overlay" id="cmdk" aria-hidden="true" onclick="if (event.target === this) closePalette()">
+    <div class="cmdk" role="dialog" aria-modal="true" aria-label="Search and jump to">
+        <div class="cmdk-input-row"><span id="cmdk-icon"></span><input id="cmdk-input" type="text" placeholder="Search pages, actions and students…" autocomplete="off" aria-controls="cmdk-list"></div>
+        <div class="cmdk-list" id="cmdk-list" role="listbox"></div>
+        <div class="cmdk-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> to move</span><span><kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></div>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   Small helpers
+   ============================================================ */
+
+const API_BASE = "/api";
+
+async function apiFetch(path, options = {}) {
+    const res = await fetch(API_BASE + path, {
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options,
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* no JSON body */ }
+    if (!res.ok) {
+        const err = new Error(data.error || `Request failed (${res.status})`);
+        err.status = res.status;
+        throw err;
+    }
+    return data;
+}
+
+function showFlash(el, message, kind) {
+    if (!el) return;
+    el.textContent = message;
+    el.className = `flash flash-${kind} visible`;
+}
+
+function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str || "";
+    // innerHTML escapes & < > but not quotes, and callers use this inside href="..." attributes.
+    return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/`/g, "&#96;");
+}
+
+function initialsOf(name) {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] || "";
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (first + last).toUpperCase();
+}
+
+function avatarHtml(name, size) {
+    return `<div class="avatar${size === "small" ? " small" : ""}" style="background:${avatarColor(name)}">${initialsOf(name)}</div>`;
+}
+
+function timeAgo(createdAt) {
+    const then = new Date(createdAt.replace(" ", "T") + "Z");
+    const mins = Math.floor((Date.now() - then.getTime()) / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
+}
+
+/* ============================================================
+   Icons (inline SVG, no emoji) + navbar
+   ============================================================ */
+
+const ICONS = {
+    brand: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/><path d="M22 10v6"/></svg>`,
+    dashboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>`,
+    feed: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>`,
+    groups: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+    events: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`,
+    friends: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.2"/><circle cx="16.2" cy="9" r="2.6"/><path d="M2.2 20c0-3.4 2.6-6 6-6 2 0 3.7 1 4.8 2.5"/><path d="M13.8 14.4c2.7.4 5.9 2 5.9 5.6"/></svg>`,
+    games: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="10" rx="5"/><path d="M7 11v4M5 13h4"/><circle cx="16" cy="11" r="1"/><circle cx="18.2" cy="14" r="1"/></svg>`,
+    profile: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>`,
+    bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>`,
+    logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`,
+    image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/></svg>`,
+    bookmark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>`,
+    heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6c0 4.4-8.8 10-8.8 10s-8.8-5.6-8.8-10a4.8 4.8 0 0 1 8.8-2.7A4.8 4.8 0 0 1 20.8 8.6z"/></svg>`,
+    chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.3-3.4A8 8 0 1 1 21 12z"/></svg>`,
+    reels: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 3l3 6M15 3l3 6"/><path d="m10.5 13 4 2.5-4 2.5z"/></svg>`,
+    resources: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.5-1.5"/></svg>`,
+    gradCap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5"/><path d="M2 8v5"/></svg>`,
+    book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.8-1.3-4.3-2-7-2v13c2.7 0 5.2.7 7 2 1.8-1.3 4.3-2 7-2V4.5c-2.7 0-5.2.7-7 2z"/><path d="M12 6.5v13"/></svg>`,
+    pencil: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>`,
+    idCard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M6 16.2c.5-1.4 1.6-2.2 2.5-2.2s2 .8 2.5 2.2"/><path d="M14.5 9.5h4M14.5 13h4M14.5 16h2.5"/></svg>`,
+    trophy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 5H4v2a4 4 0 0 0 4 4"/><path d="M16 5h4v2a4 4 0 0 1-4 4"/><path d="M12 13v4"/><path d="M8 21h8"/><path d="M10 17h4v4h-4z"/></svg>`,
+    search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>`,
+    campus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/><path d="M9 12h.01M15 12h.01M12 9h.01"/></svg>`,
+    backpack: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7V5.5a2.5 2.5 0 0 1 5 0V7"/><path d="M5 9a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9z"/><path d="M9 9h6v4H9z"/><path d="M9 21v-3M15 21v-3"/></svg>`,
+};
+
+async function loadNotifBadge() {
+    try {
+        const data = await apiFetch("/notifications");
+        const badge = document.getElementById("notif-badge");
+        if (badge) {
+            badge.textContent = data.count;
+            badge.style.display = data.count > 0 ? "inline-block" : "none";
+        }
+    } catch (e) { /* not logged in / request failed, leave badge hidden */ }
+    refreshMsgBadge();
+}
+
+async function refreshMsgBadge(known) {
+    try {
+        const n = known !== undefined ? known : (await apiFetch("/chat/unread")).unread;
+        const badge = document.getElementById("msg-badge");
+        if (!badge) return;
+        badge.textContent = n > 99 ? "99+" : n;
+        badge.style.display = n > 0 ? "inline-flex" : "none";
+    } catch (e) { /* not logged in */ }
+}
+// Check for new messages every 20 s while the tab is visible and a student is signed in.
+setInterval(() => { if (me && !document.hidden && currentView !== "messages") refreshMsgBadge(); }, 20000);
+
+async function doLogout() {
+    try { await apiFetch("/auth/logout", { method: "POST" }); } catch (e) { /* ignore */ }
+    me = null;
+    showAuth("login");
+}
+
+/* ============================================================
+   View switching (single-page app — no page reloads)
+   ============================================================ */
+
+function showAuthForm(which) {
+    document.getElementById("login-form-wrap").style.display = which === "login" ? "block" : "none";
+    document.getElementById("register-form-wrap").style.display = which === "register" ? "block" : "none";
+}
+
+function loadView(view) {
+    if (view === "dashboard") loadDashboard();
+    else if (view === "feed") loadFeed();
+    else if (view === "friends") loadFriendsView();
+    else if (view === "profile") loadProfileView();
+    else if (view === "groups") loadGroupsView();
+    else if (view === "group") loadGroupDetail();
+    else if (view === "events") loadEventsView();
+    else if (view === "resources") loadResourcesView();
+    else if (view === "reels") loadReelsView();
+    else if (view === "notifications") loadNotificationsView();
+    else if (view === "games") initGames();
+    else if (view === "messages") loadMessagesView();
+}
+
+/* ============================================================
+   Auth: login / register
+   ============================================================ */
+
+async function onLoginSubmit(e) {
+    e.preventDefault();
+    const flash = document.getElementById("login-flash");
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    try {
+        await apiFetch("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
+        document.getElementById("resend-wrap").style.display = "none";
+        showApp("dashboard");
+    } catch (err) {
+        document.getElementById("resend-wrap").style.display = err.status === 403 ? "block" : "none";
+        showFlash(flash, err.message, "error");
+    }
+}
+
+async function onResendVerification() {
+    const flash = document.getElementById("login-flash");
+    const email = document.getElementById("login-email").value;
+    try {
+        const data = await apiFetch("/auth/resend", { method: "POST", body: JSON.stringify({ email }) });
+        showFlash(flash, data.message, "success");
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+async function onRegisterSubmit(e) {
+    e.preventDefault();
+    const flash = document.getElementById("register-flash");
+    const payload = {
+        full_name: document.getElementById("reg-name").value,
+        college: document.getElementById("reg-college").value,
+        email: document.getElementById("reg-email").value,
+        password: document.getElementById("reg-password").value,
+        confirm_password: document.getElementById("reg-confirm").value,
+    };
+    try {
+        const data = await apiFetch("/auth/register", { method: "POST", body: JSON.stringify(payload) });
+        showFlash(flash, data.verification_required
+            ? "Account created! We sent a verification link to your college email — click it, then log in."
+            : "Account created! Redirecting to log in...", "success");
+        setTimeout(() => showAuthForm("login"), data.verification_required ? 4000 : 1200);
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+/* ============================================================
+   Messages (1:1 chat between friends)
+   Plain polling: the open thread asks for messages newer than the last one it has
+   every 3 s while the tab is visible; no websocket or extra server needed.
+   ============================================================ */
+
+const chat = { convs: [], otherId: null, other: null, lastId: 0, readUpto: 0, timer: null, listTimer: null, busy: false, seq: 0 };
+
+function stopChat() {
+    clearInterval(chat.timer); clearInterval(chat.listTimer);
+    chat.timer = chat.listTimer = null;
+    chat.otherId = null; chat.other = null; chat.lastId = 0; chat.seq++;
+}
+
+function msgTime(createdAt) {
+    const d = new Date(createdAt.replace(" ", "T") + "Z");
+    return d.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+}
+function msgDay(createdAt) {
+    const d = new Date(createdAt.replace(" ", "T") + "Z");
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const that = new Date(d); that.setHours(0, 0, 0, 0);
+    const diff = Math.round((today - that) / 864e5);
+    return diff === 0 ? "Today" : diff === 1 ? "Yesterday" : d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+async function loadMessagesView() {
+    showChatPlaceholder();
+    document.getElementById("chat-shell").classList.remove("in-thread");
+    await refreshConversations();
+    clearInterval(chat.listTimer);
+    chat.listTimer = setInterval(() => { if (!document.hidden) refreshConversations(); }, 8000);
+    if (pendingChatId) { const id = pendingChatId; pendingChatId = null; openChat(id); }
+}
+
+let pendingChatId = null;
+function openChatWith(userId) { pendingChatId = userId; showApp("messages"); }
+
+function showChatPlaceholder() {
+    const main = document.getElementById("chat-main");
+    main.innerHTML = `<div class="chat-placeholder" id="chat-placeholder">${ICONS.chat}<p>Select a friend to start chatting.</p></div>`;
+}
+
+async function refreshConversations() {
+    const box = document.getElementById("chat-convs");
+    if (!box) return;
+    try {
+        const data = await apiFetch("/chat/conversations");
+        chat.convs = data.conversations;
+        refreshMsgBadge(data.unread_total);
+        if (!data.conversations.length) {
+            box.innerHTML = `<div class="empty-note">No friends yet. Add classmates from the Friends page, then message them here.</div>`;
+            return;
+        }
+        box.innerHTML = "";
+        data.conversations.forEach((c) => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.className = "conv-item" + (c.id === chat.otherId ? " active" : "") + (c.unread ? " unread" : "");
+            const last = c.last_message ? (c.last_message.mine ? "You: " : "") + c.last_message.content : c.college;
+            b.innerHTML = `${avatarHtml(c.full_name)}
+                <span class="conv-text"><span class="conv-name">${escapeHtml(c.full_name)}</span><span class="conv-last" style="display:block;">${escapeHtml(last)}</span></span>
+                ${c.unread ? `<span class="conv-dot">${c.unread}</span>` : ""}`;
+            b.onclick = () => openChat(c.id);
+            box.appendChild(b);
+        });
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+async function openChat(otherId) {
+    const mySeq = ++chat.seq;
+    clearInterval(chat.timer);
+    chat.otherId = otherId; chat.lastId = 0; chat.readUpto = 0;
+    document.getElementById("chat-shell").classList.add("in-thread");
+    const main = document.getElementById("chat-main");
+    main.innerHTML = `<div class="chat-placeholder"><p class="loading-note">Loading…</p></div>`;
+    try {
+        const data = await apiFetch(`/chat/${otherId}`);
+        if (mySeq !== chat.seq) return;                       // the student opened another chat meanwhile
+        chat.other = data.other;
+        main.innerHTML = `
+            <div class="chat-head">
+                <button type="button" class="small-btn secondary chat-back" onclick="closeChatThread()" aria-label="Back to conversations">←</button>
+                ${avatarHtml(data.other.full_name, "small")}
+                <div><div class="person-name">${escapeHtml(data.other.full_name)}</div><div class="person-meta">${escapeHtml(data.other.college)}</div></div>
+            </div>
+            <div class="chat-log" id="chat-log" aria-live="polite"></div>
+            <div id="chat-flash" class="flash chat-flash"></div>
+            <form class="chat-form" id="chat-form">
+                <textarea id="chat-input" rows="1" maxlength="1000" placeholder="Write a message…" title="Enter to send, Shift+Enter for a new line" aria-label="Message"></textarea>
+                <button type="submit" class="small-btn" id="chat-send">Send</button>
+            </form>`;
+        document.getElementById("chat-form").onsubmit = onChatSend;
+        const input = document.getElementById("chat-input");
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); onChatSend(e); }
+        });
+        input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 120) + "px"; });
+        renderChatMessages(data.messages, data.read_upto, true);
+        input.focus();
+        refreshConversations();
+        loadNotifBadge();                                      // opening the thread cleared its unread count
+        chat.timer = setInterval(pollChat, 3000);
+    } catch (err) {
+        if (mySeq !== chat.seq) return;
+        if (err.status === 401) { showAuth("login"); return; }
+        main.innerHTML = `<div class="chat-placeholder"><p>${escapeHtml(err.message)}</p></div>`;
+    }
+}
+
+function useStarter(kind) {
+    const fn = firstName(chat.other ? chat.other.full_name : "");
+    const input = document.getElementById("chat-input");
+    if (!input) return;
+    if (kind === "intro") {
+        // Prefilled so the student can edit it before sending.
+        const mine = me ? `I'm ${me.full_name} from ${me.college}` : "I'm a student here";
+        input.value = `Hi ${fn}! ${mine}. Nice to connect with you. What are you studying?`;
+        input.dispatchEvent(new Event("input"));
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    } else {
+        input.value = kind === "hi" ? `Hi ${fn}! 👋` : `Hi ${fn}, how are you?`;
+        onChatSend(new Event("submit"));
+    }
+}
+
+function closeChatThread() {
+    clearInterval(chat.timer); chat.timer = null;
+    chat.otherId = null; chat.seq++;
+    document.getElementById("chat-shell").classList.remove("in-thread");
+    showChatPlaceholder();
+    refreshConversations();
+}
+
+function renderChatMessages(messages, readUpto, replace) {
+    const log = document.getElementById("chat-log");
+    if (!log) return;
+    const nearBottom = replace || log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+    if (replace) { log.innerHTML = ""; chat.lastId = 0; }
+    if (replace && !messages.length) {
+        const fn = firstName(chat.other.full_name);
+        log.innerHTML = `<div class="chat-empty">No messages yet. Say hi to ${escapeHtml(fn)}.
+            <div class="chat-starters">
+                <button type="button" class="small-btn secondary" data-starter="hi">Hi! 👋</button>
+                <button type="button" class="small-btn secondary" data-starter="how">How are you?</button>
+                <button type="button" class="small-btn secondary" data-starter="intro">Introduce myself</button>
+            </div></div>`;
+        log.querySelectorAll("[data-starter]").forEach((b) => { b.onclick = () => useStarter(b.dataset.starter); });
+    }
+    if (messages.length) log.querySelector(".chat-empty")?.remove();
+    let lastDay = log.dataset.day || "";
+    messages.forEach((m) => {
+        const day = msgDay(m.created_at);
+        if (day !== lastDay) {
+            const d = document.createElement("div"); d.className = "msg-day"; d.textContent = day; log.appendChild(d); lastDay = day;
+        }
+        const el = document.createElement("div");
+        el.className = "msg " + (m.mine ? "mine" : "theirs");
+        el.dataset.id = m.id; el.dataset.mine = m.mine ? "1" : "";
+        el.appendChild(document.createTextNode(m.content));    // text node: never parsed as HTML
+        const t = document.createElement("small"); t.textContent = msgTime(m.created_at);
+        el.appendChild(t);
+        log.appendChild(el);
+        chat.lastId = Math.max(chat.lastId, m.id);
+    });
+    log.dataset.day = lastDay;
+    chat.readUpto = Math.max(chat.readUpto, readUpto || 0);
+    log.querySelectorAll('.msg.mine').forEach((el) => {
+        const t = el.querySelector("small");
+        const seen = Number(el.dataset.id) <= chat.readUpto;
+        if (t && !t.dataset.base) t.dataset.base = t.textContent;
+        if (t) t.textContent = t.dataset.base + (seen ? " · Seen" : "");
+    });
+    if (nearBottom) log.scrollTop = log.scrollHeight;
+}
+
+async function pollChat() {
+    if (document.hidden || !chat.otherId || chat.busy) return;
+    const id = chat.otherId, mySeq = chat.seq;
+    try {
+        const data = await apiFetch(`/chat/${id}?after=${chat.lastId}`);
+        if (mySeq !== chat.seq) return;
+        renderChatMessages(data.messages, data.read_upto, false);
+        if (data.messages.length) refreshConversations();
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+        else if (err.status === 403) { stopChat(); showChatPlaceholder(); refreshConversations(); }
+    }
+}
+
+async function onChatSend(e) {
+    e.preventDefault();
+    if (chat.busy || !chat.otherId) return;
+    const input = document.getElementById("chat-input");
+    const flash = document.getElementById("chat-flash");
+    const content = input.value.trim();
+    if (!content) return;
+    chat.busy = true;
+    document.getElementById("chat-send").disabled = true;
+    flash.className = "flash chat-flash";
+    const mySeq = chat.seq;
+    try {
+        const data = await apiFetch(`/chat/${chat.otherId}`, { method: "POST", body: JSON.stringify({ content }) });
+        if (mySeq !== chat.seq) return;
+        input.value = ""; input.style.height = "auto";
+        renderChatMessages([data.message], 0, false);
+        const log = document.getElementById("chat-log"); if (log) log.scrollTop = log.scrollHeight;
+        if (data.notice) showFlash(flash, data.notice, "success");
+        refreshConversations();
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(flash, err.message, "error");
+    } finally {
+        chat.busy = false;
+        const btn = document.getElementById("chat-send"); if (btn) btn.disabled = false;
+        document.getElementById("chat-input")?.focus();
+    }
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+
+/* ============================================================
+   Feed (posts, likes, comments) — shared by the main feed and
+   group pages, since both render the same kind of post card.
+   ============================================================ */
+
+let feedTab = "recent";
+
+function setFeedTab(tab) {
+    feedTab = tab;
+    document.querySelectorAll("#view-feed .tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+    loadFeed();
+}
+
+async function loadFeed() {
+    const container = document.getElementById("posts-list");
+    container.innerHTML = `<p class="loading-note">Loading...</p>`;
+    try {
+        const path = feedTab === "trending" ? "/posts/trending" : feedTab === "saved" ? "/posts/saved" : "/posts/feed";
+        const data = await apiFetch(path);
+        container.innerHTML = data.posts.length ? "" : emptyState(feedTab === "saved" ? ICONS.bookmark : ICONS.pencil, feedTab === "saved" ? "Nothing saved yet. Use Save on a post to keep it here." : "No posts yet — be the first to share something.");
+        data.posts.forEach((post) => container.appendChild(renderPostCard(post)));
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(document.getElementById("posts-flash"), err.message, "error");
+    }
+}
+
+function renderPostCard(post) {
+    const el = document.createElement("div");
+    el.className = "post-card";
+    el.innerHTML = `
+        <div class="post-header">
+            ${avatarHtml(post.author_name, "small")}
+            <div class="post-header-text">
+                <span class="post-author">${escapeHtml(post.author_name)}</span>
+                <span class="post-time">${timeAgo(post.created_at)}</span>
+            </div>
+        </div>
+        <div class="post-content">${escapeHtml(post.content)}</div>
+        ${post.image_url ? `<img class="post-image" src="${escapeHtml(post.image_url)}" alt="Image attached to ${escapeHtml(post.author_name)}'s post" loading="lazy" onclick="openLightbox(this.src, this.alt)">` : ""}
+        ${post.video ? `<div class="post-video-slot"></div>` : ""}
+        <div class="post-actions">
+            <button type="button" class="small-btn icon-btn secondary like-btn${post.liked ? " liked" : ""}" onclick="onLikePost(this, ${post.id})">${ICONS.heart}<span>${post.liked ? "Liked" : "Like"} (${post.likes})</span></button>
+            <button type="button" class="small-btn icon-btn secondary" onclick="toggleComments(${post.id})">${ICONS.chat}<span id="comment-label-${post.id}">Comments (${post.comment_count})</span></button>
+            <button type="button" class="small-btn icon-btn secondary push save-btn${post.saved ? " saved" : ""}" onclick="onSavePost(this, ${post.id})" title="Save this post for later">${ICONS.bookmark}<span>${post.saved ? "Saved" : "Save"}</span></button>
+            ${post.can_delete ? `<button type="button" class="small-btn icon-btn danger" onclick="onDeletePost(this, ${post.id})"><span>Delete</span></button>` : ""}
+        </div>
+        <div class="comments-section" id="comments-${post.id}" style="display:none;">
+            <div class="comments-list" id="comments-list-${post.id}"></div>
+            <form class="comment-form" onsubmit="onAddComment(event, ${post.id})">
+                <input type="text" placeholder="Add an educational comment..." maxlength="500">
+                <button type="submit" class="small-btn">Send</button>
+            </form>
+        </div>
+    `;
+    const slot = el.querySelector(".post-video-slot");
+    if (slot && typeof youtubeMedia === "function") {
+        const wrap = document.createElement("div");
+        wrap.className = "post-video";
+        wrap.appendChild(youtubeMedia({ media_ref: post.video.id, title: post.video.title, start: 0, kind: "post" }));
+        slot.replaceWith(wrap);
+        if (post.video.title && post.video.title !== "Video") {
+            const cap = document.createElement("div"); cap.className = "post-video-title"; cap.textContent = post.video.title;
+            wrap.after(cap);
+        }
+    }
+    return el;
+}
+
+async function onLikePost(btn, postId) {
+    btn.disabled = true;
+    try {
+        const data = await apiFetch(`/posts/${postId}/like`, { method: "POST" });
+        btn.classList.toggle("liked", data.post.liked);
+        btn.innerHTML = `${ICONS.heart}<span>${data.post.liked ? "Liked" : "Like"} (${data.post.likes})</span>`;
+        if (data.post.liked) { btn.classList.add("pop"); setTimeout(() => btn.classList.remove("pop"), 500); }
+    } catch (err) { /* ignore */ } finally {
+        btn.disabled = false;
+    }
+}
+
+async function onSavePost(btn, postId) {
+    btn.disabled = true;
+    try {
+        const data = await apiFetch(`/posts/${postId}/save`, { method: "POST" });
+        btn.classList.toggle("saved", data.post.saved);
+        btn.innerHTML = `${ICONS.bookmark}<span>${data.post.saved ? "Saved" : "Save"}</span>`;
+        showToast(data.post.saved ? "Saved. Find it under Feed > Saved." : "Removed from Saved.");
+        if (!data.post.saved && feedTab === "saved") { btn.closest(".post-card").remove(); }
+    } catch (err) { showToast(err.message, "error"); } finally { btn.disabled = false; }
+}
+
+/* ---- Images: pick, shrink in the browser, preview, lightbox ---- */
+const composerImages = {};   // "feed" | "group" -> data URL
+function takeVideo(key) {    // returns the pasted YouTube link (or undefined) and resets the row
+    const input = document.getElementById(`${key}-video-url`), v = input.value.trim();
+    return v || undefined;
+}
+function clearVideo(key) { document.getElementById(`${key}-video-url`).value = ""; document.getElementById(`${key}-video-row`).hidden = true; }
+
+function resizeImage(file, maxSide = 1280, maxBytes = 1.5 * 1024 * 1024) {
+    return new Promise((resolve, reject) => {
+        if (!/^image\/(png|jpeg|gif|webp)$/.test(file.type)) return reject(new Error("Please choose a PNG, JPEG, GIF or WebP image."));
+        if (file.size > 12 * 1024 * 1024) return reject(new Error("That image is too large. Please pick one under 12 MB."));
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);   // flatten transparency
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            for (let q = 0.88; q >= 0.4; q -= 0.12) {
+                const out = canvas.toDataURL("image/jpeg", q);
+                if (out.length * 0.75 <= maxBytes) return resolve(out);
+            }
+            reject(new Error("That image is still too large after shrinking. Try a smaller one."));
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("That image couldn't be opened.")); };
+        img.src = url;
+    });
+}
+
+function setComposerImage(key, dataUrl) {
+    const box = document.getElementById(`${key}-image-preview`);
+    if (!dataUrl) { delete composerImages[key]; box.hidden = true; box.innerHTML = ""; return; }
+    composerImages[key] = dataUrl;
+    const kb = Math.round(dataUrl.length * 0.75 / 1024);
+    box.innerHTML = `<img alt="Preview of the image you are attaching"><button type="button" class="remove" aria-label="Remove image">&times;</button><span class="size">${kb} KB</span>`;
+    box.querySelector("img").src = dataUrl;
+    box.querySelector(".remove").onclick = () => setComposerImage(key, null);
+    box.hidden = false;
+}
+
+function initAttachments() {
+    document.querySelectorAll(".attach-btn[data-attach]").forEach((btn) => {
+        btn.insertAdjacentHTML("afterbegin", ICONS.image);
+        const key = btn.dataset.attach, input = document.getElementById(`${key}-image-input`);
+        btn.addEventListener("click", () => input.click());
+        input.addEventListener("change", async () => {
+            const file = input.files[0]; input.value = "";
+            if (!file) return;
+            btn.disabled = true;
+            try { setComposerImage(key, await resizeImage(file)); }
+            catch (err) { showToast(err.message, "error"); }
+            finally { btn.disabled = false; }
+        });
+    });
+    document.querySelectorAll(".video-btn").forEach((btn) => {
+        btn.insertAdjacentHTML("afterbegin", ICONS.reels);
+        const key = btn.dataset.video, row = document.getElementById(`${key}-video-row`), input = document.getElementById(`${key}-video-url`);
+        btn.addEventListener("click", () => { row.hidden = !row.hidden; if (!row.hidden) input.focus(); else input.value = ""; });
+    });
+    document.querySelectorAll(".video-clear").forEach((b) => b.addEventListener("click", () => {
+        const key = b.dataset.clear; document.getElementById(`${key}-video-url`).value = ""; document.getElementById(`${key}-video-row`).hidden = true;
+    }));
+    const lb = document.createElement("div");
+    lb.className = "lightbox"; lb.id = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", "Image viewer");
+    lb.innerHTML = `<img alt=""><button type="button" aria-label="Close image">&times;</button>`;
+    lb.addEventListener("click", closeLightbox);
+    document.body.appendChild(lb);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+}
+function openLightbox(src, alt) { const lb = document.getElementById("lightbox"); lb.querySelector("img").src = src; lb.querySelector("img").alt = alt || ""; lb.classList.add("open"); }
+function closeLightbox() { const lb = document.getElementById("lightbox"); if (lb) lb.classList.remove("open"); }
+
+async function onDeletePost(btn, postId) {
+    if (!confirm("Delete this post? This also removes its comments and likes.")) return;
+    btn.disabled = true;
+    try {
+        await apiFetch(`/posts/${postId}`, { method: "DELETE" });
+        btn.closest(".post-card").remove();
+    } catch (err) {
+        btn.disabled = false;
+        alert(err.message);
+    }
+}
+
+async function toggleComments(postId) {
+    const section = document.getElementById(`comments-${postId}`);
+    const isHidden = section.style.display === "none";
+    section.style.display = isHidden ? "block" : "none";
+    if (isHidden) await loadPostComments(postId);
+}
+
+async function loadPostComments(postId) {
+    const list = document.getElementById(`comments-list-${postId}`);
+    list.innerHTML = `<p class="loading-note">Loading comments...</p>`;
+    try {
+        const data = await apiFetch(`/posts/${postId}/comments`);
+        list.innerHTML = data.comments.length ? "" : `<p class="empty-note">No comments yet.</p>`;
+        data.comments.forEach((c) => {
+            const div = document.createElement("div");
+            div.className = "comment-row";
+            div.innerHTML = `<span class="comment-author">${escapeHtml(c.author_name || "Student")}</span>${escapeHtml(c.content)}`;
+            list.appendChild(div);
+        });
+    } catch (err) { /* ignore */ }
+}
+
+async function onAddComment(e, postId) {
+    e.preventDefault();
+    const input = e.target.querySelector("input");
+    const content = input.value.trim();
+    if (!content) return;
+    try {
+        const created = await apiFetch(`/posts/${postId}/comments`, { method: "POST", body: JSON.stringify({ content }) });
+        if (created.notice) showToast(created.notice);
+        input.value = "";
+        await loadPostComments(postId);
+        const label = document.getElementById(`comment-label-${postId}`);
+        const list = document.getElementById(`comments-list-${postId}`);
+        if (label) label.textContent = `Comments (${list.children.length})`;
+    } catch (err) {
+        showToast(err.message, "error");
+    }
+}
+
+async function onCreatePost(e) {
+    e.preventDefault();
+    const flash = document.getElementById("composer-flash");
+    const textarea = document.getElementById("post-content");
+    const content = textarea.value.trim();
+    if (!content) { showFlash(flash, composerImages.feed || takeVideo("feed") ? "Add a short caption that says what you are sharing." : "Write something first.", "error"); return; }
+    try {
+        const created = await apiFetch("/posts", { method: "POST", body: JSON.stringify({ content, image: composerImages.feed || undefined, video: takeVideo("feed") }) });
+        textarea.value = ""; setComposerImage("feed", null); clearVideo("feed");
+        if (created.notice) showToast(created.notice);
+        if (feedTab === "recent") loadFeed();
+        else showFlash(flash, "Posted! Switch to Recent to see it.", "success");
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+/* ============================================================
+   Friends
+   ============================================================ */
+
+function personRow(person, actionsHtml) {
+    const div = document.createElement("div");
+    div.className = "person-row";
+    div.innerHTML = `
+        <div class="person-main">
+            ${avatarHtml(person.full_name)}
+            <div>
+                <div class="person-name">${escapeHtml(person.full_name)}</div>
+                <div class="person-meta">${escapeHtml(person.college)} &middot; ${escapeHtml(person.email)}</div>
+                ${relationHtml(person)}
+            </div>
+        </div>
+        <div class="person-actions">${actionsHtml}</div>
+    `;
+    return div;
+}
+
+function relationHtml(person) {
+    const bits = [];
+    if (person.distance === 2) bits.push("Friend of a friend");
+    else if (person.distance > 2) bits.push(`${person.distance} degrees away`);
+    if (person.mutual_count) bits.push(`${person.mutual_count} mutual friend${person.mutual_count === 1 ? "" : "s"}`);
+    return bits.length ? `<div class="person-meta" style="color:var(--primary-dark);">${bits.join(" &middot; ")}</div>` : "";
+}
+
+async function loadSuggestions() {
+    const container = document.getElementById("suggestions-list");
+    try {
+        const data = await apiFetch("/friends/suggestions");
+        container.innerHTML = data.suggestions.length ? "" : emptyState(ICONS.friends, "No suggestions yet — add a few friends and people they know will show up here.");
+        data.suggestions.forEach((person) => container.appendChild(personRow(person,
+            `<button type="button" class="small-btn" onclick="onSendFriendRequest(this, ${person.id})">Add friend</button>`)));
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+async function onRemoveFriend(friendId) {
+    if (!confirm("Remove this friend?")) return;
+    try {
+        await apiFetch(`/friends/${friendId}/remove`, { method: "POST" });
+        loadFriendsList();
+        loadSuggestions();
+    } catch (err) {
+        showFlash(document.getElementById("requests-flash"), err.message, "error");
+    }
+}
+
+let searchTimer;
+function onSearchInput(e) {
+    clearTimeout(searchTimer);
+    const q = e.target.value;
+    searchTimer = setTimeout(() => runFriendSearch(q), 250);
+}
+
+async function runFriendSearch(q) {
+    const container = document.getElementById("search-results");
+    container.innerHTML = "";
+    try {
+        const data = await apiFetch(`/students/search?q=${encodeURIComponent(q)}`);
+        if (data.results.length === 0) {
+            container.innerHTML = emptyState(ICONS.search, "No students found.");
+            return;
+        }
+        data.results.forEach((person) => {
+            const actions = person.is_friend
+                ? `<span class="tag">Friends</span>`
+                : `<button type="button" class="small-btn" onclick="onSendFriendRequest(this, ${person.id})">Add friend</button>`;
+            container.appendChild(personRow(person, actions));
+        });
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(document.getElementById("search-flash"), err.message, "error");
+    }
+}
+
+async function onSendFriendRequest(btn, receiverId) {
+    btn.disabled = true;
+    const flash = document.getElementById("search-flash");
+    try {
+        await apiFetch("/friends/request", { method: "POST", body: JSON.stringify({ receiver_id: receiverId }) });
+        btn.textContent = "Request sent";
+        showFlash(flash, "Friend request sent.", "success");
+        showToast("Friend request sent.");
+        loadFriendRequests();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+        showToast(err.message, "error");
+        btn.disabled = false;
+    }
+}
+
+async function loadFriendRequests() {
+    try {
+        const data = await apiFetch("/friends/requests");
+        const incoming = document.getElementById("incoming-list");
+        incoming.innerHTML = data.incoming.length ? "" : emptyState(ICONS.friends, "No incoming requests.");
+        data.incoming.forEach((person) => {
+            const actions = `
+                <button type="button" class="small-btn" onclick="onRespondRequest(${person.request_id}, 'accept')">Accept</button>
+                <button type="button" class="small-btn danger" onclick="onRespondRequest(${person.request_id}, 'reject')">Reject</button>
+            `;
+            incoming.appendChild(personRow(person, actions));
+        });
+        const outgoing = document.getElementById("outgoing-list");
+        outgoing.innerHTML = data.outgoing.length ? "" : emptyState(ICONS.friends, "No sent requests pending.");
+        data.outgoing.forEach((person) => outgoing.appendChild(personRow(person, `<span class="tag gold">Pending</span>`)));
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+async function onRespondRequest(requestId, action) {
+    const flash = document.getElementById("requests-flash");
+    try {
+        await apiFetch(`/friends/requests/${requestId}/respond`, { method: "POST", body: JSON.stringify({ action }) });
+        showFlash(flash, `Request ${action}ed.`, "success");
+        loadFriendRequests();
+        loadFriendsList();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+async function loadFriendsList() {
+    const container = document.getElementById("friends-list");
+    try {
+        const data = await apiFetch("/friends");
+        container.innerHTML = data.friends.length ? "" : emptyState(ICONS.backpack, "No friends yet — search above to send requests.");
+        data.friends.forEach((person) => container.appendChild(personRow(person,
+            `<button type="button" class="small-btn icon-btn" onclick="openChatWith(${person.id})">${ICONS.chat}<span>Message</span></button>
+             <button type="button" class="small-btn danger" onclick="onRemoveFriend(${person.id})">Remove</button>`)));
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+function loadFriendsView() {
+    const q = pendingFriendQuery; pendingFriendQuery = "";
+    document.getElementById("search-input").value = q;
+    runFriendSearch(q);
+    loadFriendRequests();
+    loadFriendsList();
+    loadSuggestions();
+}
+
+/* ============================================================
+   Profile
+   ============================================================ */
+
+async function loadProfileView() {
+    try {
+        const data = await apiFetch("/profile");
+        document.getElementById("profile-name").textContent = data.user.full_name;
+        document.getElementById("profile-email-college").textContent = `${data.user.email} · ${data.user.college}`;
+        document.getElementById("profile-bio").value = data.profile.bio || "";
+        document.getElementById("profile-major").value = data.profile.major || "";
+        document.getElementById("profile-year").value = data.profile.year || "";
+        document.getElementById("profile-interests").value = data.profile.interests || "";
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+async function onSaveProfile(e) {
+    e.preventDefault();
+    const flash = document.getElementById("profile-flash");
+    const payload = {
+        bio: document.getElementById("profile-bio").value,
+        major: document.getElementById("profile-major").value,
+        year: document.getElementById("profile-year").value,
+        interests: document.getElementById("profile-interests").value,
+    };
+    try {
+        await apiFetch("/profile", { method: "PUT", body: JSON.stringify(payload) });
+        showFlash(flash, "Profile updated.", "success");
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+/* ============================================================
+   Groups
+   ============================================================ */
+
+let groupSearchTimer;
+function onGroupSearchInput() {
+    clearTimeout(groupSearchTimer);
+    groupSearchTimer = setTimeout(loadGroupsView, 250);
+}
+
+async function loadGroupsView() {
+    const container = document.getElementById("groups-list");
+    const q = document.getElementById("group-search").value.trim();
+    try {
+        const data = await apiFetch(`/groups${q ? "?q=" + encodeURIComponent(q) : ""}`);
+        container.innerHTML = data.groups.length ? "" : emptyState(ICONS.gradCap, q ? "No groups match that search." : "No groups yet — start the first one above.");
+        data.groups.forEach((g) => {
+            const div = document.createElement("div");
+            div.className = "group-card";
+            const actions = g.is_member
+                ? `<button type="button" class="small-btn" onclick="showApp('group', {groupId: ${g.id}})">Open</button>`
+                : `<button type="button" class="small-btn secondary" onclick="onJoinGroup(${g.id})">Join</button>`;
+            div.innerHTML = `
+                <div class="person-main">
+                    <div class="avatar tile">${ICONS.groups}</div>
+                    <div><h3>${escapeHtml(g.name)}</h3><div class="person-meta">${escapeHtml(g.topic)}</div></div>
+                </div>
+                <div class="group-card-foot">
+                    <span class="person-meta">${g.member_count} member${g.member_count === 1 ? "" : "s"}${g.is_member ? " · Joined" : ""}</span>
+                    ${actions}
+                </div>`;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(document.getElementById("groups-flash"), err.message, "error");
+    }
+}
+
+async function onJoinGroup(groupId) {
+    try {
+        await apiFetch(`/groups/${groupId}/join`, { method: "POST" });
+        loadGroupsView();
+    } catch (err) {
+        showFlash(document.getElementById("groups-flash"), err.message, "error");
+    }
+}
+
+async function onCreateGroup(e) {
+    e.preventDefault();
+    const flash = document.getElementById("create-group-flash");
+    const name = document.getElementById("group-name").value.trim();
+    const topic = document.getElementById("group-topic").value.trim();
+    try {
+        await apiFetch("/groups", { method: "POST", body: JSON.stringify({ name, topic }) });
+        document.getElementById("create-group-form").reset();
+        showFlash(flash, "Group created.", "success");
+        loadGroupsView();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+async function loadGroupDetail() {
+    if (!currentGroupId) { showApp("groups"); return; }
+    try {
+        const data = await apiFetch(`/groups/${currentGroupId}`);
+        document.getElementById("group-detail-name").textContent = data.group.name;
+        document.getElementById("group-detail-meta").textContent =
+            `${data.group.topic} · ${data.group.member_count} member${data.group.member_count === 1 ? "" : "s"}`;
+        document.getElementById("group-composer-card").style.display = data.group.is_member ? "block" : "none";
+        document.getElementById("leave-group-btn").style.display = data.group.is_member ? "inline-block" : "none";
+        document.getElementById("join-group-btn").style.display = data.group.is_member ? "none" : "inline-block";
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(document.getElementById("group-detail-flash"), err.message, "error");
+    }
+    loadGroupPosts();
+}
+
+async function loadGroupPosts() {
+    const container = document.getElementById("group-posts-list");
+    try {
+        const data = await apiFetch(`/groups/${currentGroupId}/posts`);
+        container.innerHTML = data.posts.length ? "" : emptyState(ICONS.pencil, "No posts in this group yet.");
+        data.posts.forEach((post) => container.appendChild(renderPostCard(post)));
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+        else container.innerHTML = emptyState(ICONS.groups, "Join this group to see its posts.");
+    }
+}
+
+async function onGroupPost(e) {
+    e.preventDefault();
+    const flash = document.getElementById("group-composer-flash");
+    const textarea = document.getElementById("group-post-content");
+    const content = textarea.value.trim();
+    if (!content) { showFlash(flash, composerImages.group || takeVideo("group") ? "Add a short caption that says what you are sharing." : "Write something first.", "error"); return; }
+    try {
+        const created = await apiFetch("/posts", { method: "POST", body: JSON.stringify({ content, group_id: currentGroupId, image: composerImages.group || undefined, video: takeVideo("group") }) });
+        textarea.value = ""; setComposerImage("group", null); clearVideo("group");
+        if (created.notice) showToast(created.notice);
+        loadGroupPosts();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+async function joinCurrentGroup() {
+    try {
+        await apiFetch(`/groups/${currentGroupId}/join`, { method: "POST" });
+        loadGroupDetail();
+    } catch (err) {
+        showFlash(document.getElementById("group-detail-flash"), err.message, "error");
+    }
+}
+
+async function leaveCurrentGroup() {
+    try {
+        await apiFetch(`/groups/${currentGroupId}/leave`, { method: "POST" });
+        showApp("groups");
+    } catch (err) {
+        showFlash(document.getElementById("group-detail-flash"), err.message, "error");
+    }
+}
+
+/* ============================================================
+   Events
+   ============================================================ */
+
+let eventScope = "college";
+
+function setEventScope(scope) {
+    eventScope = scope;
+    document.querySelectorAll("#view-events .tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.scope === scope));
+    loadEventsView();
+}
+
+async function loadEventsView() {
+    const container = document.getElementById("events-list");
+    try {
+        const data = await apiFetch(`/events?scope=${eventScope}`);
+        container.innerHTML = data.events.length ? "" : emptyState(ICONS.events, "No upcoming events.");
+        data.events.forEach((ev) => {
+            const div = document.createElement("div");
+            div.className = "event-row";
+            const w = eventWhen(ev);
+            div.innerHTML = `
+                ${dateTile(ev)}
+                <div class="grow">
+                    <div class="person-name">${escapeHtml(ev.title)}</div>
+                    <div class="person-meta">${w.label} · ${escapeHtml(ev.college)}</div>
+                    ${ev.description ? `<div class="person-meta" style="margin-top:4px;">${escapeHtml(ev.description)}</div>` : ""}
+                    ${ev.image_url ? `<img class="post-image event-poster" src="${escapeHtml(ev.image_url)}" alt="Poster for ${escapeHtml(ev.title)}" loading="lazy" onclick="openLightbox(this.src, this.alt)">` : ""}
+                </div>`;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(document.getElementById("events-flash"), err.message, "error");
+    }
+}
+
+async function onCreateEvent(e) {
+    e.preventDefault();
+    const flash = document.getElementById("create-event-flash");
+    const title = document.getElementById("event-title").value.trim();
+    const event_date = document.getElementById("event-date").value;
+    const description = document.getElementById("event-description").value.trim();
+    try {
+        await apiFetch("/events", { method: "POST", body: JSON.stringify({ title, event_date, description, image: composerImages.event || undefined }) });
+        document.getElementById("create-event-form").reset(); setComposerImage("event", null);
+        showFlash(flash, "Event created.", "success");
+        loadEventsView();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+/* ============================================================
+   Resources
+   ============================================================ */
+
+async function loadAnnouncements() {
+    const container = document.getElementById("announcements-list");
+    try {
+        const data = await apiFetch("/announcements");
+        container.innerHTML = data.announcements.length ? "" : emptyState(ICONS.bell, "No announcements from your college yet.");
+        data.announcements.forEach((a) => {
+            const div = document.createElement("div");
+            div.className = "person-row";
+            div.innerHTML = `
+                <div class="person-main">
+                    <div class="avatar tile">${ICONS.bell}</div>
+                    <div>
+                        <div class="person-name">${escapeHtml(a.title)}</div>
+                        <div class="person-meta">${escapeHtml(a.author_name)} &middot; ${timeAgo(a.created_at)}</div>
+                        <div class="announce-body">${escapeHtml(a.body)}</div>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+async function onCreateAnnouncement(e) {
+    e.preventDefault();
+    const flash = document.getElementById("create-announcement-flash");
+    const title = document.getElementById("announcement-title").value.trim();
+    const body = document.getElementById("announcement-body").value.trim();
+    try {
+        await apiFetch("/announcements", { method: "POST", body: JSON.stringify({ title, body }) });
+        document.getElementById("create-announcement-form").reset();
+        showFlash(flash, "Announcement posted.", "success");
+        loadAnnouncements();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+async function loadResourcesView() {
+    loadAnnouncements();
+    const container = document.getElementById("resources-list");
+    try {
+        const data = await apiFetch("/resources");
+        container.innerHTML = data.resources.length ? "" : emptyState(ICONS.resources, "No links shared yet. Be the first!");
+        data.resources.forEach((res) => {
+            const div = document.createElement("div");
+            div.className = "person-row";
+            div.innerHTML = `
+                <div class="person-main">
+                    <div class="avatar tile">${ICONS.resources}</div>
+                    <div>
+                        <div class="person-name"><a href="${escapeHtml(res.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(res.title)}</a></div>
+                        <div class="person-meta">Shared by ${escapeHtml(res.added_by_name)} &middot; ${timeAgo(res.created_at)}</div>
+                        ${res.description ? `<div class="person-meta" style="margin-top:4px;">${escapeHtml(res.description)}</div>` : ""}
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        if (err.status === 401) { showAuth("login"); return; }
+        showFlash(document.getElementById("resources-flash"), err.message, "error");
+    }
+}
+
+async function onCreateResource(e) {
+    e.preventDefault();
+    const flash = document.getElementById("create-resource-flash");
+    const title = document.getElementById("resource-title").value.trim();
+    const url = document.getElementById("resource-url").value.trim();
+    const description = document.getElementById("resource-description").value.trim();
+    try {
+        await apiFetch("/resources", { method: "POST", body: JSON.stringify({ title, url, description }) });
+        document.getElementById("create-resource-form").reset();
+        showFlash(flash, "Link shared.", "success");
+        loadResourcesView();
+    } catch (err) {
+        showFlash(flash, err.message, "error");
+    }
+}
+
+/* ============================================================
+   Notifications
+   ============================================================ */
+
+async function loadNotificationsView() {
+    const container = document.getElementById("notifications-list");
+    try {
+        const data = await apiFetch("/notifications");
+        container.innerHTML = data.items.length ? "" : emptyState(ICONS.bell, "You're all caught up.");
+        data.items.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "person-row";
+            const icon = { friend_request: ICONS.friends, announcement: ICONS.bell, message: ICONS.chat }[item.type] || ICONS.events;
+            const targetView = { friend_request: "friends", announcement: "resources", message: "messages" }[item.type] || "events";
+            div.innerHTML = `
+                <div class="person-main">
+                    <div class="avatar">${icon}</div>
+                    <div class="person-name">${escapeHtml(item.message)}</div>
+                </div>
+                <div class="person-actions"><button type="button" class="small-btn" onclick="showApp('${targetView}')">View</button></div>
+            `;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        if (err.status === 401) showAuth("login");
+    }
+}
+
+/* ============================================================
+   Games — Tic-Tac-Toe (minimax CPU) + Sliding Puzzle
+   ============================================================ */
+
+let ttt = Array(9).fill(null);
+let tttOver = false;
+let tttLine = [];
+const WIN_LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+
+function setGameTab(game) {
+    document.querySelectorAll("#view-games .tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.game === game));
+    document.getElementById("tictactoe-panel").style.display = game === "tictactoe" ? "block" : "none";
+    document.getElementById("puzzle-panel").style.display = game === "puzzle" ? "block" : "none";
+}
+
+function initGames() {
+    renderTtt();
+    if (puzzleTiles.length === 0) shufflePuzzle();
+    else renderPuzzle();
+}
+
+function tttWinner(board) {
+    for (const [a, b, c] of WIN_LINES) {
+        if (board[a] && board[a] === board[b] && board[b] === board[c]) return board[a];
+    }
+    return board.every((c) => c) ? "draw" : null;
+}
+
+function renderTtt() {
+    const board = document.getElementById("ttt-board");
+    board.innerHTML = "";
+    ttt.forEach((val, i) => {
+        const cell = document.createElement("div");
+        cell.className = "ttt-cell" + (val === "X" ? " x" : val === "O" ? " o" : "") + (tttLine.includes(i) ? " win" : "");
+        cell.textContent = val || "";
+        if (!val && !tttOver) cell.addEventListener("click", () => tttPlayerMove(i));
+        board.appendChild(cell);
+    });
+}
+
+function tttPlayerMove(i) {
+    if (ttt[i] || tttOver) return;
+    ttt[i] = "X";
+    let winner = tttWinner(ttt);
+    if (winner) { finishTtt(winner); return; }
+    ttt[tttBestMove(ttt)] = "O";
+    winner = tttWinner(ttt);
+    renderTtt();
+    if (winner) finishTtt(winner);
+}
+
+function finishTtt(winner) {
+    tttOver = true;
+    tttLine = WIN_LINES.find(([a, b, c]) => ttt[a] && ttt[a] === ttt[b] && ttt[b] === ttt[c]) || [];
+    renderTtt();
+    document.getElementById("ttt-status").textContent =
+        winner === "draw" ? "It's a draw." : (winner === "X" ? "You win!" : "CPU wins.");
+}
+
+function tttBestMove(board) {
+    let best = -Infinity, move = -1;
+    for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+            board[i] = "O";
+            const score = tttMinimax(board, 0, false);
+            board[i] = null;
+            if (score > best) { best = score; move = i; }
+        }
+    }
+    return move;
+}
+
+function tttMinimax(board, depth, maximizing) {
+    const winner = tttWinner(board);
+    if (winner === "O") return 10 - depth;
+    if (winner === "X") return depth - 10;
+    if (winner === "draw") return 0;
+
+    let best = maximizing ? -Infinity : Infinity;
+    for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+            board[i] = maximizing ? "O" : "X";
+            const score = tttMinimax(board, depth + 1, !maximizing);
+            board[i] = null;
+            best = maximizing ? Math.max(best, score) : Math.min(best, score);
+        }
+    }
+    return best;
+}
+
+function resetTicTacToe() {
+    ttt = Array(9).fill(null);
+    tttOver = false;
+    tttLine = [];
+    document.getElementById("ttt-status").textContent = "You are X. Beat the CPU.";
+    renderTtt();
+}
+
+const PUZZLE_SIZE = 3;
+let puzzleTiles = [];
+
+function solvedTiles() {
+    const arr = [];
+    for (let i = 1; i < PUZZLE_SIZE * PUZZLE_SIZE; i++) arr.push(i);
+    arr.push(null);
+    return arr;
+}
+
+function puzzleNeighbors(i) {
+    const row = Math.floor(i / PUZZLE_SIZE), col = i % PUZZLE_SIZE, result = [];
+    if (row > 0) result.push(i - PUZZLE_SIZE);
+    if (row < PUZZLE_SIZE - 1) result.push(i + PUZZLE_SIZE);
+    if (col > 0) result.push(i - 1);
+    if (col < PUZZLE_SIZE - 1) result.push(i + 1);
+    return result;
+}
+
+function shufflePuzzle() {
+    puzzleTiles = solvedTiles();
+    let blank = puzzleTiles.indexOf(null);
+    for (let i = 0; i < 200; i++) {
+        const options = puzzleNeighbors(blank);
+        const swapWith = options[Math.floor(Math.random() * options.length)];
+        [puzzleTiles[blank], puzzleTiles[swapWith]] = [puzzleTiles[swapWith], puzzleTiles[blank]];
+        blank = swapWith;
+    }
+    document.getElementById("puzzle-status").textContent = "Arrange the tiles in order.";
+    renderPuzzle();
+}
+
+function renderPuzzle() {
+    const board = document.getElementById("puzzle-board");
+    board.innerHTML = "";
+    puzzleTiles.forEach((val, i) => {
+        const cell = document.createElement("div");
+        cell.className = "puzzle-cell" + (val === null ? " blank" : "");
+        cell.textContent = val ?? "";
+        if (val !== null) cell.addEventListener("click", () => puzzleTryMove(i));
+        board.appendChild(cell);
+    });
+}
+
+function puzzleTryMove(i) {
+    const blank = puzzleTiles.indexOf(null);
+    if (puzzleNeighbors(i).includes(blank)) {
+        [puzzleTiles[i], puzzleTiles[blank]] = [puzzleTiles[blank], puzzleTiles[i]];
+        renderPuzzle();
+        const solved = solvedTiles();
+        if (puzzleTiles.every((v, idx) => v === solved[idx])) {
+            document.getElementById("puzzle-status").textContent = "Solved! Nice work.";
+        }
+    }
+}
+
+/* ============================================================
+   Shell, theme, dashboard, network graph, palette
+   ============================================================ */
+/* ============================================================
+   Extra icons
+   ============================================================ */
+const svgi = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+Object.assign(ICONS, {
+    sun: svgi(`<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`),
+    moon: svgi(`<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>`),
+    menu: svgi(`<path d="M4 6h16M4 12h16M4 18h16"/>`),
+    chevron: svgi(`<path d="m9 6 6 6-6 6"/>`),
+    zap: svgi(`<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>`),
+});
+
+/* ============================================================
+   Navigation shell: sidebar + top bar
+   ============================================================ */
+
+const NAV_META = {
+    dashboard: { label: "Dashboard", icon: ICONS.dashboard },
+    feed: { label: "Feed", icon: ICONS.feed },
+    reels: { label: "Reels", icon: ICONS.reels },
+    groups: { label: "Groups", icon: ICONS.groups },
+    resources: { label: "Resources", icon: ICONS.resources },
+    events: { label: "Events", icon: ICONS.events },
+    friends: { label: "Friends", icon: ICONS.friends },
+    messages: { label: "Messages", icon: ICONS.chat },
+    games: { label: "Algorithm Games", icon: ICONS.games },
+    profile: { label: "Profile", icon: ICONS.profile },
+    notifications: { label: "Notifications", icon: ICONS.bell },
+    group: { label: "Group", icon: ICONS.groups },
+};
+const NAV_SECTIONS = [
+    { items: ["dashboard", "feed", "reels"] },
+    { label: "Study", items: ["groups", "resources", "events"] },
+    { label: "People", items: ["friends", "messages"] },
+    { label: "Play", items: ["games"] },
+];
+const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || "");
+
+let me = null;          // { id, full_name, college, friend_count } once loaded
+let currentView = "dashboard";
+
+function avatarColor(name) {
+    const palette = ["#0B6B4F", "#B4561E", "#3C5A99", "#7A3E8E", "#8A6B0F", "#2F7D86", "#A23B5B"];
+    let h = 0;
+    for (const ch of name || "?") h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return palette[h % palette.length];
+}
+
+function renderNav(activeView) {
+    currentView = activeView;
+    const activeKey = activeView === "group" ? "groups" : activeView;
+    const sections = NAV_SECTIONS.map((sec) =>
+        (sec.label ? `<div class="sb-section">${sec.label}</div>` : "") +
+        sec.items.map((v) => `<button type="button" class="ghost sb-link${v === activeKey ? " active" : ""}" onclick="showApp('${v}')"${v === activeKey ? ' aria-current="page"' : ""}>${NAV_META[v].icon}<span>${NAV_META[v].label}</span>${v === "messages" ? `<span class="sb-badge" id="msg-badge" style="display:none;"></span>` : ""}</button>`).join("")
+    ).join("");
+    const name = me ? me.full_name : "Your account";
+    const sub = me ? me.college : "";
+    document.getElementById("app-nav").innerHTML = `
+        <div class="sb-brand"><span class="brand-mark">${ICONS.brand}</span>CampusConnect</div>
+        <nav aria-label="Main">${sections}</nav>
+        <div class="sb-foot">
+            <button type="button" class="ghost sb-user" onclick="showApp('profile')" aria-label="Open your profile">
+                ${avatarHtml(name)}
+                <span><span class="sb-user-name">${escapeHtml(name)}</span><span class="sb-user-sub">${escapeHtml(sub)}</span></span>
+            </button>
+            <button type="button" class="ghost sb-link logout" onclick="doLogout()">${ICONS.logout}<span>Log out</span></button>
+        </div>`;
+    const title = (NAV_META[activeView] || NAV_META.dashboard).label;
+    document.getElementById("app-topbar").innerHTML = `
+        <button type="button" class="top-icon menu-btn" onclick="toggleSidebar()" aria-label="Open menu">${ICONS.menu}</button>
+        <h1 class="page-title">${title}</h1>
+        <button type="button" class="cmdk-btn" onclick="openPalette()" aria-label="Search or jump to a page">${ICONS.search}<span>Search or jump to…</span><kbd>${IS_MAC ? "⌘ K" : "Ctrl K"}</kbd></button>
+        <button type="button" class="top-icon" id="theme-btn" onclick="toggleTheme()" aria-label="Switch between light and dark theme">${currentTheme() === "dark" ? ICONS.sun : ICONS.moon}</button>
+        <button type="button" class="top-icon" onclick="showApp('notifications')" aria-label="Notifications">${ICONS.bell}<span id="notif-badge" class="badge" style="display:none;"></span></button>`;
+    const ca = document.getElementById("composer-avatar");
+    if (ca) ca.innerHTML = avatarHtml(name);
+    loadNotifBadge();
+}
+
+async function refreshMe() {
+    try {
+        const d = await apiFetch("/dashboard");
+        me = { ...d.user, friend_count: d.friend_count };
+        renderNav(currentView);
+    } catch (e) { /* 401 is handled by the view that is loading */ }
+}
+
+function toggleSidebar() { document.getElementById("app-shell").classList.toggle("nav-open"); }
+function closeSidebar() { document.getElementById("app-shell").classList.remove("nav-open"); }
+
+/* ---------- Theme ---------- */
+function currentTheme() { return document.documentElement.getAttribute("data-theme") || "light"; }
+function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("cc_theme", t); } catch (e) { /* storage unavailable */ }
+    const b = document.getElementById("theme-btn");
+    if (b) b.innerHTML = t === "dark" ? ICONS.sun : ICONS.moon;
+    netRefreshColors();
+}
+function toggleTheme() { applyTheme(currentTheme() === "dark" ? "light" : "dark"); }
+
+/* ============================================================
+   View switching
+   ============================================================ */
+
+const VIEWS = ["dashboard", "feed", "friends", "profile", "groups", "group", "events", "resources", "reels", "notifications", "games", "messages"];
+let currentGroupId = null;
+
+function showApp(view, opts = {}) {
+    closeSidebar();
+    document.getElementById("view-auth").style.display = "none";
+    document.getElementById("app-shell").style.display = "grid";
+    VIEWS.forEach((v) => { document.getElementById(`view-${v}`).style.display = v === view ? "block" : "none"; });
+    if (view !== "dashboard") stopNetwork();
+    if (view !== "messages") stopChat();
+    if (view === "group" && opts.groupId) currentGroupId = opts.groupId;
+    renderNav(view);
+    if (!me) refreshMe();
+    loadView(view);
+    petOnView(view);
+    window.scrollTo(0, 0);
+}
+
+function showAuth(which) {
+    me = null;
+    stopNetwork();
+    stopChat();
+    closePalette();
+    document.getElementById("app-shell").style.display = "none";
+    document.getElementById("view-auth").style.display = "flex";
+    showAuthForm(which);
+    petOnView("auth");
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+
+function eventWhen(ev) {
+    const [y, m, d] = ev.event_date.split("-").map(Number);
+    const dt = new Date(y, m - 1, d);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = Math.round((dt - today) / 864e5);
+    return {
+        month: dt.toLocaleDateString("en-IN", { month: "short" }), day: d, days,
+        label: days <= 0 ? "Today" : days === 1 ? "Tomorrow" : `In ${days} days`,
+    };
+}
+function dateTile(ev) {
+    const w = eventWhen(ev);
+    return `<div class="date-tile${w.days <= 3 ? " soon" : ""}"><small>${w.month}</small><b>${w.day}</b></div>`;
+}
+function firstName(full) {
+    const f = (full || "").trim().split(/\s+/)[0] || "there";
+    return f.charAt(0).toUpperCase() + f.slice(1);
+}
+
+async function loadDashboard() {
+    const calls = await Promise.allSettled([
+        apiFetch("/dashboard"), apiFetch("/network"), apiFetch("/events?scope=college"),
+        apiFetch("/friends/suggestions?limit=4"), apiFetch("/posts/trending"), apiFetch("/groups"),
+    ]);
+    const [dash, network, events, sugg, trend, groups] = calls;
+    if (currentView !== "dashboard") return;          // the student already navigated away
+    if (calls.some((c) => c.status === "rejected" && c.reason && c.reason.status === 401)) { showAuth("login"); return; }
+
+    if (dash.status === "fulfilled") {
+        me = { ...dash.value.user, friend_count: dash.value.friend_count };
+        renderNav("dashboard");
+        const hour = new Date().getHours();
+        const part = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+        document.getElementById("dash-welcome").textContent = `${part}, ${firstName(me.full_name)}`;
+        const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+        document.getElementById("dash-college").textContent = `${me.college} · ${today}`;
+    }
+
+    const evList = events.status === "fulfilled" ? events.value.events : [];
+    const grpList = groups.status === "fulfilled" ? groups.value.groups.filter((g) => g.is_member) : [];
+    const thisWeek = evList.filter((e) => eventWhen(e).days <= 7).length;
+    const friendCount = me ? me.friend_count : 0;
+    document.getElementById("dash-chips").innerHTML = `
+        <button type="button" class="chip" onclick="showApp('friends')"><b>${friendCount}</b>${friendCount === 1 ? "friend" : "friends"}</button>
+        <button type="button" class="chip" onclick="showApp('groups')"><b>${grpList.length}</b>${grpList.length === 1 ? "group" : "groups"}</button>
+        <button type="button" class="chip" onclick="showApp('events')"><b>${thisWeek}</b>${thisWeek === 1 ? "event this week" : "events this week"}</button>`;
+
+    // Up next
+    const upNext = document.getElementById("dash-events");
+    upNext.innerHTML = evList.length ? evList.slice(0, 3).map((ev) => {
+        const w = eventWhen(ev);
+        return `<div class="mini-row">${dateTile(ev)}<div class="grow"><div class="person-name">${escapeHtml(ev.title)}</div><div class="person-meta">${w.label}</div></div></div>`;
+    }).join("") : `<p class="mini-empty">Nothing scheduled yet. Add an event for your college.</p>`;
+
+    // People you may know
+    const sg = document.getElementById("dash-suggestions");
+    const list = sugg.status === "fulfilled" ? sugg.value.suggestions : [];
+    sg.innerHTML = list.length ? list.map((p) => `
+        <div class="mini-row">${avatarHtml(p.full_name, "small")}
+            <div class="grow"><div class="person-name">${escapeHtml(p.full_name)}</div>
+            <div class="person-meta">${p.mutual_count ? `${p.mutual_count} mutual friend${p.mutual_count === 1 ? "" : "s"}` : "Friend of a friend"}</div></div>
+            <button type="button" class="small-btn" onclick="onSendFriendRequest(this, ${p.id})">Add</button>
+        </div>`).join("") : `<p class="mini-empty">Add a few friends and the people they know will show up here.</p>`;
+
+    // Your groups
+    const gr = document.getElementById("dash-groups");
+    gr.innerHTML = grpList.length ? grpList.slice(0, 4).map((g) => `
+        <div class="mini-row"><div class="avatar tile small">${ICONS.groups}</div>
+            <div class="grow"><div class="person-name">${escapeHtml(g.name)}</div>
+            <div class="person-meta">${escapeHtml(g.topic)}</div></div>
+            <button type="button" class="small-btn secondary" onclick="showApp('group', {groupId: ${g.id}})">Open</button>
+        </div>`).join("") : `<p class="mini-empty">You haven't joined a group yet. Find one for your subject.</p>`;
+
+    // Trending
+    const tc = document.getElementById("trend-card");
+    const top = trend.status === "fulfilled" ? trend.value.posts[0] : null;
+    tc.innerHTML = top ? `
+        <div class="side-card-head"><h2>Trending in your circle</h2><button type="button" class="link-btn" onclick="showApp('feed'); setFeedTab('trending')">Open feed</button></div>
+        <div class="post-header">${avatarHtml(top.author_name, "small")}<div class="post-header-text"><span class="post-author">${escapeHtml(top.author_name)}</span><span class="post-time">${timeAgo(top.created_at)}</span></div></div>
+        <div class="post-content">${escapeHtml(top.content)}</div>
+        <div class="trend-meta"><span>${ICONS.heart}${top.likes} like${top.likes === 1 ? "" : "s"}</span><span>${ICONS.chat}${top.comment_count} comment${top.comment_count === 1 ? "" : "s"}</span></div>`
+        : `<div class="side-card-head"><h2>Trending in your circle</h2></div><p class="mini-empty">Posts that get likes and comments will show up here.</p>`;
+
+    // Network graph
+    if (network.status === "fulfilled") netShow(network.value);
+}
+
+/* ============================================================
+   Live friend-network graph (canvas, no libraries)
+   The server runs a BFS from you out to 2 hops (/api/network).
+   Here: force-directed layout, hover, drag, and click-to-trace
+   the shortest path (a second BFS, in the browser).
+   ============================================================ */
+
+const NET = {
+    nodes: [], edges: [], byId: new Map(), adj: new Map(), me: null, showFof: true,
+    hover: null, sel: null, path: [], pathStart: 0, drag: null,
+    w: 0, h: 0, dpr: 1, raf: 0, running: false, t0: 0, colors: null,
+    canvas: null, ctx: null, stage: null, tip: null, ro: null, ready: false,
+    reduced: window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+};
+
+function netColors() {
+    const cs = getComputedStyle(document.documentElement);
+    const g = (n) => cs.getPropertyValue(n).trim();
+    return { me: g("--accent"), friend: g("--primary"), fof: g("--net-fof"), line: g("--net-line"), text: g("--text"),
+             muted: g("--muted"), surface: g("--surface"), font: getComputedStyle(document.body).fontFamily };
+}
+function netRefreshColors() { if (NET.colors) NET.colors = netColors(); }
+const netVisible = (n) => NET.showFof || n.level < 2;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function netInit() {
+    if (NET.ready) return;
+    NET.canvas = document.getElementById("net-canvas");
+    NET.ctx = NET.canvas.getContext("2d");
+    NET.stage = document.getElementById("net-stage");
+    NET.tip = document.getElementById("net-tip");
+    NET.ready = true;
+    NET.ro = new ResizeObserver(() => netResize());
+    NET.ro.observe(NET.stage);
+
+    const pt = (e) => { const r = NET.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    const hit = (p) => {
+        for (let i = NET.nodes.length - 1; i >= 0; i--) {
+            const n = NET.nodes[i];
+            if (netVisible(n) && Math.hypot(n.x - p.x, n.y - p.y) <= n.r + 6) return n;
+        }
+        return null;
+    };
+    NET.canvas.addEventListener("pointermove", (e) => {
+        const p = pt(e);
+        if (NET.drag) {
+            const d = NET.drag;
+            if (!d.moved && Math.hypot(p.x - d.sx, p.y - d.sy) > 4) d.moved = true;
+            if (d.moved) { d.n.x = clamp(p.x, d.n.r, NET.w - d.n.r); d.n.y = clamp(p.y, d.n.r, NET.h - d.n.r); d.n.vx = d.n.vy = 0; }
+        }
+        netSetHover(NET.drag ? NET.drag.n : hit(p));
+    });
+    NET.canvas.addEventListener("pointerdown", (e) => {
+        const p = pt(e), n = hit(p);
+        if (!n) return;
+        NET.drag = { n, sx: p.x, sy: p.y, moved: false };
+        n.pinned = true;
+        NET.canvas.setPointerCapture(e.pointerId);
+    });
+    const release = (select) => {
+        if (!NET.drag) return;
+        const { n, moved } = NET.drag;
+        n.pinned = false; NET.drag = null;
+        if (select && !moved) netSelect(n);
+    };
+    NET.canvas.addEventListener("pointerup", () => release(true));
+    NET.canvas.addEventListener("pointercancel", () => release(false));
+    NET.canvas.addEventListener("pointerleave", () => { if (!NET.drag) netSetHover(null); });
+    document.getElementById("net-fof-toggle").addEventListener("click", (e) => {
+        NET.showFof = !NET.showFof;
+        e.currentTarget.setAttribute("aria-pressed", String(NET.showFof));
+        if (!NET.showFof) {
+            if (NET.sel && NET.sel.level === 2) netClear();
+            if (NET.hover && NET.hover.level === 2) netSetHover(null);
+        }
+    });
+}
+
+function netShow(data) {
+    if (currentView !== "dashboard") return;
+    netInit();
+    NET.colors = netColors();
+    NET.me = data.me;
+    NET.nodes = data.nodes.map((n) => ({
+        ...n, x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, angle: 0, pinned: false, delay: 0, p: 0,
+        r: n.level === 0 ? 19 : n.level === 1 ? 13 : 8,
+    }));
+    NET.byId = new Map(NET.nodes.map((n) => [n.id, n]));
+    NET.adj = new Map(NET.nodes.map((n) => [n.id, new Set()]));
+    data.edges.forEach(([a, b]) => { if (NET.adj.has(a) && NET.adj.has(b)) { NET.adj.get(a).add(b); NET.adj.get(b).add(a); } });
+    NET.edges = data.edges.filter(([a, b]) => NET.byId.has(a) && NET.byId.has(b)).map(([a, b]) => ({ a: NET.byId.get(a), b: NET.byId.get(b) }));
+    NET.sel = null; NET.path = []; NET.hover = null;
+
+    // Angles: friends evenly around the first ring; friends-of-friends fan out near a parent friend.
+    const lvl1 = NET.nodes.filter((n) => n.level === 1).sort((a, b) => a.id - b.id);
+    lvl1.forEach((n, i) => { n.angle = -Math.PI / 2 + (i * 2 * Math.PI) / lvl1.length; });
+    const kids = new Map();
+    NET.nodes.filter((n) => n.level === 2).sort((a, b) => a.id - b.id).forEach((n) => {
+        const parent = lvl1.find((f) => NET.adj.get(n.id).has(f.id));
+        const key = parent ? parent.id : 0;
+        if (!kids.has(key)) kids.set(key, []);
+        kids.get(key).push(n);
+    });
+    kids.forEach((list, key) => {
+        const base = NET.byId.has(key) ? NET.byId.get(key).angle : 0;
+        list.forEach((n, k) => { n.angle = base + (k - (list.length - 1) / 2) * 0.3; });
+    });
+    NET.nodes.filter((n) => n.level === 0).forEach((n) => { n.angle = 0; });
+    NET.nodes.forEach((n, i) => { n.delay = n.level === 0 ? 0 : n.level === 1 ? 160 + i * 55 : 520 + i * 28; });
+
+    const hasFof = NET.nodes.some((n) => n.level === 2);
+    document.getElementById("net-fof-toggle").style.display = hasFof ? "" : "none";
+    const lonely = NET.nodes.length <= 1;
+    document.getElementById("net-empty").hidden = !lonely;
+    document.querySelector(".net-legend").style.visibility = lonely ? "hidden" : "visible";
+    document.getElementById("net-canvas").setAttribute("aria-label",
+        `Friend network: you, ${lvl1.length} friend${lvl1.length === 1 ? "" : "s"} and ${NET.nodes.length - 1 - lvl1.length} friends of friends. Use the list below the graph to explore.`);
+
+    const row = document.getElementById("circle-row");
+    row.innerHTML = lvl1.map((n) => `<button type="button" class="circle-chip" data-id="${n.id}">${avatarHtml(n.full_name, "small")}${escapeHtml(firstName(n.full_name))}</button>`).join("");
+    row.style.display = lvl1.length ? "flex" : "none";
+    row.querySelectorAll(".circle-chip").forEach((b) => {
+        const n = NET.byId.get(Number(b.dataset.id));
+        b.addEventListener("click", () => netSelect(n));
+        b.addEventListener("mouseenter", () => netSetHover(n));
+        b.addEventListener("mouseleave", () => netSetHover(null));
+    });
+    netReadout();
+    netResize(true);
+    netStart();
+}
+
+function netResize(fresh) {
+    if (!NET.stage) return;
+    const w = NET.stage.clientWidth, h = NET.stage.clientHeight;
+    if (!w || !h) return;
+    const oldW = NET.w, oldH = NET.h;
+    NET.w = w; NET.h = h; NET.dpr = window.devicePixelRatio || 1;
+    NET.canvas.width = Math.round(w * NET.dpr); NET.canvas.height = Math.round(h * NET.dpr);
+    NET.ctx.setTransform(NET.dpr, 0, 0, NET.dpr, 0, 0);
+    netTargets();
+    if (fresh || !oldW) {
+        NET.nodes.forEach((n) => { n.x = n.tx + (Math.random() - .5) * 30; n.y = n.ty + (Math.random() - .5) * 30; n.vx = n.vy = 0; });
+        for (let i = 0; i < 140; i++) netStep(0);       // pre-settle so the first frame already looks right
+    } else {
+        NET.nodes.forEach((n) => { n.x = (n.x / oldW) * w; n.y = (n.y / oldH) * h; });
+    }
+}
+
+function netTargets() {
+    const cx = NET.w / 2, cy = NET.h / 2, rx = NET.w / 2 - 56, ry = NET.h / 2 - 46;
+    NET.nodes.forEach((n) => {
+        const f = n.level === 0 ? 0 : n.level === 1 ? 0.5 : 0.93;
+        n.tx = cx + Math.cos(n.angle) * rx * f;
+        n.ty = cy + Math.sin(n.angle) * ry * f;
+    });
+}
+
+function netStep(now) {
+    if (!NET.w || !NET.h) return;
+    const vis = NET.nodes.filter(netVisible);
+    for (let i = 0; i < vis.length; i++) {
+        const a = vis[i];
+        for (let j = i + 1; j < vis.length; j++) {
+            const b = vis[j];
+            let dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy;
+            if (d2 > 36000) continue;
+            if (d2 < 1) { dx = Math.random() - .5; dy = Math.random() - .5; d2 = 1; }
+            const d = Math.sqrt(d2), f = 2200 / d2;
+            dx = (dx / d) * f; dy = (dy / d) * f;
+            a.vx += dx; a.vy += dy; b.vx -= dx; b.vy -= dy;
+        }
+    }
+    for (const e of NET.edges) {
+        if (!netVisible(e.a) || !netVisible(e.b)) continue;
+        const dx = e.b.x - e.a.x, dy = e.b.y - e.a.y, d = Math.hypot(dx, dy) || 1, k = (d - 110) * 0.003;
+        e.a.vx += (dx / d) * k; e.a.vy += (dy / d) * k; e.b.vx -= (dx / d) * k; e.b.vy -= (dy / d) * k;
+    }
+    for (const n of vis) {
+        if (n.pinned) continue;
+        const k = n.level === 0 ? 0.2 : 0.04;
+        n.vx += (n.tx - n.x) * k; n.vy += (n.ty - n.y) * k;
+        if (!NET.reduced && now) { n.vx += Math.sin(now / 1500 + n.id) * 0.035; n.vy += Math.cos(now / 1700 + n.id * 2) * 0.035; }
+        n.vx *= 0.8; n.vy *= 0.8;
+        n.x = clamp(n.x + n.vx, n.r + 4, NET.w - n.r - 4);
+        n.y = clamp(n.y + n.vy, n.r + 4, NET.h - n.r - 4);
+    }
+}
+
+function netDraw(now) {
+    const { ctx, w, h, colors: c } = NET;
+    if (!w || !h) return;
+    ctx.clearRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2, rx = Math.max(10, w / 2 - 56), ry = Math.max(10, h / 2 - 46);
+    ctx.save(); ctx.setLineDash([3, 7]); ctx.strokeStyle = c.line; ctx.lineWidth = 1;
+    [0.5, 0.93].forEach((f, i) => {
+        if (i === 1 && (!NET.showFof || !NET.nodes.some((n) => n.level === 2))) return;
+        ctx.beginPath(); ctx.ellipse(cx, cy, rx * f, ry * f, 0, 0, Math.PI * 2); ctx.stroke();
+    });
+    ctx.restore();
+
+    NET.nodes.forEach((n) => {
+        n.p = NET.reduced ? 1 : clamp((now - NET.t0 - n.delay) / 480, 0, 1);
+        n.p = 1 - Math.pow(1 - n.p, 3);
+    });
+    const focus = NET.hover || NET.sel;
+    const near = focus ? new Set([focus.id, ...NET.adj.get(focus.id)]) : null;
+    const onPath = new Set(NET.path);
+
+    ctx.lineCap = "round";
+    for (const e of NET.edges) {
+        if (!netVisible(e.a) || !netVisible(e.b)) continue;
+        const lit = focus && (e.a === focus || e.b === focus);
+        ctx.globalAlpha = Math.min(e.a.p, e.b.p) * (focus && !lit ? 0.16 : 1);
+        ctx.strokeStyle = lit ? c.friend : c.line; ctx.lineWidth = lit ? 2 : 1.3;
+        ctx.beginPath(); ctx.moveTo(e.a.x, e.a.y); ctx.lineTo(e.b.x, e.b.y); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    if (NET.path.length > 1) {              // the traced shortest path, drawn segment by segment
+        const prog = NET.reduced ? NET.path.length : clamp((now - NET.pathStart) / 650, 0, 1) * (NET.path.length - 1);
+        ctx.strokeStyle = c.me; ctx.lineWidth = 4;
+        for (let i = 0; i < NET.path.length - 1; i++) {
+            const f = clamp(prog - i, 0, 1);
+            if (f <= 0) break;
+            const u = NET.byId.get(NET.path[i]), v = NET.byId.get(NET.path[i + 1]);
+            ctx.beginPath(); ctx.moveTo(u.x, u.y); ctx.lineTo(u.x + (v.x - u.x) * f, u.y + (v.y - u.y) * f); ctx.stroke();
+        }
+    }
+
+    const order = NET.nodes.filter(netVisible).sort((a, b) => b.level - a.level);
+    for (const n of order) {
+        const r = n.r * n.p;
+        if (r < 0.5) continue;
+        const dim = focus && !near.has(n.id) && !onPath.has(n.id);
+        ctx.globalAlpha = dim ? 0.25 : 1;
+        if (n.level === 0 && !NET.reduced) {
+            const t = (now / 2000) % 1;
+            ctx.strokeStyle = c.me; ctx.globalAlpha = (1 - t) * 0.45; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(n.x, n.y, r + t * 18, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+        if (n === focus || onPath.has(n.id)) {
+            ctx.globalAlpha = 0.35; ctx.strokeStyle = c.me; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.arc(n.x, n.y, r + 3, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+        ctx.fillStyle = n.level === 0 ? c.me : n.level === 1 ? c.friend : c.fof;
+        ctx.strokeStyle = c.surface; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        if (n.level <= 1 && n.p > 0.7) {
+            ctx.fillStyle = n.level === 0 ? "#3A2500" : "#fff";
+            ctx.font = `700 ${n.level === 0 ? 12 : 10.5}px ${c.font}`;
+            ctx.fillText(n.level === 0 ? "You" : initialsOf(n.full_name), n.x, n.y + 0.5);
+        }
+        const label = n.level === 1 || n === focus || onPath.has(n.id);
+        if (label && n.level > 0 && n.p > 0.85) {
+            ctx.fillStyle = c.text; ctx.font = `600 12px ${c.font}`;
+            ctx.fillText(firstName(n.full_name), n.x, n.y + r + 13);
+        }
+        ctx.globalAlpha = 1;
+    }
+}
+
+function netLoop(now) {
+    if (!NET.running) return;
+    NET.raf = requestAnimationFrame(netLoop);
+    netStep(now);
+    netDraw(now);
+}
+function netStart() {
+    stopNetwork();
+    NET.running = true; NET.t0 = performance.now();
+    NET.raf = requestAnimationFrame(netLoop);
+}
+function stopNetwork() { NET.running = false; cancelAnimationFrame(NET.raf); }
+
+function netSetHover(n) {
+    NET.hover = n;
+    if (NET.canvas) NET.canvas.style.cursor = n ? (NET.drag && NET.drag.moved ? "grabbing" : "pointer") : "default";
+    document.querySelectorAll(".circle-chip").forEach((b) => b.classList.toggle("on", !!NET.sel && Number(b.dataset.id) === NET.sel.id));
+    const tip = NET.tip;
+    if (!n || !netVisible(n)) { tip.classList.remove("on"); return; }
+    const who = n.level === 0 ? "This is you" : n.level === 1 ? "Friend" : "Friend of a friend";
+    const bits = [who, `${n.degree} friend${n.degree === 1 ? "" : "s"}`];
+    if (n.level > 0 && n.mutual_count) bits.push(`${n.mutual_count} mutual`);
+    tip.innerHTML = `<b>${escapeHtml(n.full_name)}</b><span>${bits.join(" · ")}</span>`;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let x = n.x + n.r + 12; if (x + tw > NET.w - 8) x = n.x - n.r - 12 - tw;
+    tip.style.left = `${clamp(x, 8, NET.w - tw - 8)}px`;
+    tip.style.top = `${clamp(n.y - th / 2, 8, NET.h - th - 8)}px`;
+    tip.classList.add("on");
+}
+
+function netBfs(from, to) {             // shortest path over the friend graph, same idea as Graph.shortest_path
+    const parent = new Map([[from, null]]);
+    const queue = [from];
+    while (queue.length) {
+        const cur = queue.shift();
+        if (cur === to) break;
+        for (const nb of NET.adj.get(cur) || []) {
+            if (!parent.has(nb)) { parent.set(nb, cur); queue.push(nb); }
+        }
+    }
+    if (!parent.has(to)) return [];
+    const path = [];
+    for (let at = to; at !== null; at = parent.get(at)) path.push(at);
+    return path.reverse();
+}
+
+function netSelect(n) {
+    if (!n || n.level === 0) { netClear(); return; }
+    NET.sel = n;
+    NET.path = netBfs(NET.me, n.id);
+    NET.pathStart = performance.now();
+    document.querySelectorAll(".circle-chip").forEach((b) => b.classList.toggle("on", Number(b.dataset.id) === n.id));
+    netReadout();
+}
+function netClear() {
+    NET.sel = null; NET.path = [];
+    document.querySelectorAll(".circle-chip").forEach((b) => b.classList.remove("on"));
+    netReadout();
+}
+
+function netReadout() {
+    const el = document.getElementById("net-readout");
+    const n = NET.sel;
+    if (!n) {
+        el.innerHTML = NET.nodes.length > 1
+            ? `Hover a classmate to see who they are. Click one to trace the shortest path from you.`
+            : `Your network starts with your first friend.`;
+        return;
+    }
+    const hops = NET.path.length - 1;
+    const chips = NET.path.map((id, i) => {
+        const node = NET.byId.get(id);
+        return `<span class="node${i === 0 ? " me" : ""}">${i === 0 ? "You" : escapeHtml(firstName(node.full_name))}</span>`;
+    }).join(ICONS.chevron);
+    const action = n.level === 2 ? `<button type="button" class="small-btn" onclick="onSendFriendRequest(this, ${n.id})">Add friend</button>` : "";
+    el.innerHTML = `<span class="path">${chips}</span><span>${hops === 1 ? "Direct friend" : `${hops} degrees away`}</span>${action}`;
+}
+
+/* ============================================================
+   Command palette (Ctrl/⌘ + K or "/")
+   ============================================================ */
+
+const PAL = { open: false, items: [], sel: 0, students: [], timer: null, seq: 0 };
+let pendingFriendQuery = "";
+
+function paletteBaseItems() {
+    const pages = ["dashboard", "feed", "reels", "groups", "resources", "events", "friends", "messages", "games", "profile", "notifications"]
+        .map((v) => ({ kind: "page", group: "Go to", label: NAV_META[v].label, icon: NAV_META[v].icon, run: () => showApp(v) }));
+    const actions = [
+        { kind: "action", group: "Actions", label: currentTheme() === "dark" ? "Switch to light theme" : "Switch to dark theme", icon: currentTheme() === "dark" ? ICONS.sun : ICONS.moon, run: toggleTheme },
+        { kind: "action", group: "Actions", label: "Share something in the feed", icon: ICONS.pencil, run: () => { showApp("feed"); setTimeout(() => document.getElementById("post-content").focus(), 60); } },
+        { kind: "action", group: "Actions", label: "Log out", icon: ICONS.logout, run: doLogout },
+    ];
+    return [...pages, ...actions];
+}
+
+function paletteRender() {
+    const q = document.getElementById("cmdk-input").value.trim().toLowerCase();
+    const base = paletteBaseItems().filter((i) => !q || i.label.toLowerCase().split(/\s+/).some((w) => w.startsWith(q)) || i.label.toLowerCase().includes(q));
+    const students = q.length >= 2 ? PAL.students.map((s) => ({
+        kind: "student", group: "Students", label: s.full_name, hint: s.college, icon: ICONS.friends,
+        run: () => { pendingFriendQuery = s.full_name; showApp("friends"); },
+    })) : [];
+    PAL.items = [...base, ...students];
+    PAL.sel = clamp(PAL.sel, 0, Math.max(0, PAL.items.length - 1));
+    const list = document.getElementById("cmdk-list");
+    if (!PAL.items.length) { list.innerHTML = `<div class="cmdk-empty">Nothing matches “${escapeHtml(q)}”. Try a page name or a classmate's name.</div>`; return; }
+    let html = "", last = "";
+    PAL.items.forEach((it, i) => {
+        if (it.group !== last) { html += `<div class="cmdk-group">${it.group}</div>`; last = it.group; }
+        html += `<button type="button" class="cmdk-item${i === PAL.sel ? " sel" : ""}" data-i="${i}" role="option" aria-selected="${i === PAL.sel}">${it.icon}<span>${escapeHtml(it.label)}</span>${it.hint ? `<small>${escapeHtml(it.hint)}</small>` : ""}</button>`;
+    });
+    list.innerHTML = html;
+    const sel = list.querySelector(".cmdk-item.sel");
+    if (sel) sel.scrollIntoView({ block: "nearest" });
+}
+
+function paletteRun(i) {
+    const it = PAL.items[i];
+    if (!it) return;
+    closePalette();
+    it.run();
+}
+
+function openPalette() {
+    if (document.getElementById("app-shell").style.display === "none") return;
+    PAL.open = true; PAL.sel = 0; PAL.students = [];
+    const ov = document.getElementById("cmdk");
+    ov.classList.add("open");
+    ov.setAttribute("aria-hidden", "false");
+    const input = document.getElementById("cmdk-input");
+    input.value = "";
+    paletteRender();
+    input.focus();
+}
+function closePalette() {
+    PAL.open = false;
+    const ov = document.getElementById("cmdk");
+    if (!ov) return;
+    ov.classList.remove("open");
+    ov.setAttribute("aria-hidden", "true");
+}
+
+function initPalette() {
+    document.getElementById("cmdk-icon").innerHTML = ICONS.search;
+    const input = document.getElementById("cmdk-input");
+    input.addEventListener("input", () => {
+        PAL.sel = 0;
+        paletteRender();
+        clearTimeout(PAL.timer);
+        const q = input.value.trim();
+        if (q.length < 2) { PAL.students = []; return; }
+        const seq = ++PAL.seq;
+        PAL.timer = setTimeout(async () => {
+            try {
+                const data = await apiFetch(`/students/search?q=${encodeURIComponent(q)}`);   // Trie prefix search on the server
+                if (seq === PAL.seq && PAL.open) { PAL.students = data.results.slice(0, 5); paletteRender(); }
+            } catch (e) { /* palette still works for pages */ }
+        }, 180);
+    });
+    document.getElementById("cmdk-list").addEventListener("click", (e) => {
+        const b = e.target.closest(".cmdk-item");
+        if (b) paletteRun(Number(b.dataset.i));
+    });
+    document.getElementById("cmdk-list").addEventListener("mousemove", (e) => {
+        const b = e.target.closest(".cmdk-item");
+        if (b && Number(b.dataset.i) !== PAL.sel) {
+            document.querySelectorAll(".cmdk-item.sel").forEach((x) => x.classList.remove("sel"));
+            PAL.sel = Number(b.dataset.i); b.classList.add("sel");
+        }
+    });
+    document.addEventListener("keydown", (e) => {
+        const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "");
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); PAL.open ? closePalette() : openPalette(); return; }
+        if (e.key === "/" && !typing && !PAL.open) { e.preventDefault(); openPalette(); return; }
+        if (!PAL.open) { if (e.key === "Escape") closeSidebar(); return; }
+        if (e.key === "Escape") { e.preventDefault(); closePalette(); }
+        else if (e.key === "ArrowDown") { e.preventDefault(); PAL.sel = (PAL.sel + 1) % Math.max(1, PAL.items.length); paletteRender(); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); PAL.sel = (PAL.sel - 1 + PAL.items.length) % Math.max(1, PAL.items.length); paletteRender(); }
+        else if (e.key === "Enter") { e.preventDefault(); paletteRun(PAL.sel); }
+    });
+}
+
+/* ============================================================
+   Startup
+   ============================================================ */
+
+
+/* ============================================================
+   Toast + campus pet
+   ============================================================ */
+
+let toastTimer;
+function showToast(message, kind) {
+    const el = document.getElementById("toast");
+    el.textContent = message;
+    el.className = `toast visible${kind === "error" ? " error" : ""}`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("visible"), kind === "error" ? 5000 : 7000);
+}
+
+const PET_TIPS = {
+    auth: "Hi, I'm {pet}! Sign up with your official college email and I'll show you around.",
+    dashboard: "Welcome back! Hover a classmate in the network, or press Ctrl K to jump anywhere.",
+    feed: "Tap Trending to see what everyone's talking about. I check posts for safety, so keep it friendly!",
+    friends: "Search a classmate by name. \"People you may know\" shows friends of friends.",
+    groups: "Join a study group or start your own. Try searching by topic!",
+    group: "Posts in a group are only visible to its members.",
+    events: "Know about an event? Add it so your whole college can see.",
+    resources: "Share notes and links here, or post an announcement for your college.",
+    reels: "Short explainers! Try the animated ones, they show how this app's own code works.",
+    games: "Try beating the CPU — it plays tic-tac-toe with the minimax algorithm!",
+    profile: "A good bio and interests help classmates find you.",
+    notifications: "Friend requests, events and announcements all land here.",
+    messages: "Pick a friend on the left to chat. You can only message people you are friends with.",
+};
+const PET_CHIPS = {
+    auth: ["How do I sign up?", "Why verify my email?"],
+    default: ["What can I do here?", "How do I make friends?", "What gets blocked?"],
+};
+const pet = {
+    name: "Mochi", ai: false, authed: false, view: "auth", open: false, busy: false,
+    history: [], greeted: new Set(), tips: true, bubbleTimer: null,
+};
+
+function petStore(key, value) {
+    try {
+        if (value === undefined) return localStorage.getItem(key);
+        localStorage.setItem(key, value);
+    } catch (e) { /* storage unavailable (private mode etc.) — fine */ }
+    return null;
+}
+
+function petSay(text, who = "pet") {
+    const log = document.getElementById("pet-log");
+    const div = document.createElement("div");
+    div.className = `pet-msg ${who}`;
+    div.textContent = text;           // textContent: model output is never treated as HTML
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+}
+
+function petGoButton(view) {
+    const label = { dashboard: "Dashboard", feed: "Feed", friends: "Friends", groups: "Groups", events: "Events",
+                    resources: "Resources", games: "Games", profile: "Profile", notifications: "Notifications", messages: "Messages" }[view];
+    if (!label) return;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "pet-go"; b.textContent = `Take me to ${label} →`;
+    b.onclick = () => { showApp(view); petHappy(); };
+    document.getElementById("pet-log").appendChild(b);
+    document.getElementById("pet-log").scrollTop = 1e6;
+}
+
+function petHappy() {
+    const root = document.getElementById("pet-root");
+    root.classList.add("happy");
+    setTimeout(() => root.classList.remove("happy"), 1100);
+}
+
+function renderPetChips() {
+    const chips = document.getElementById("pet-chips");
+    const list = pet.authed ? PET_CHIPS.default : PET_CHIPS.auth;
+    chips.innerHTML = "";
+    chips.style.display = pet.history.length > 2 ? "none" : "flex";
+    list.forEach((q) => {
+        const c = document.createElement("button");
+        c.type = "button"; c.className = "pet-chip"; c.textContent = q;
+        c.onclick = () => petSend(q);
+        chips.appendChild(c);
+    });
+}
+
+function petBubble(text) {
+    const bubble = document.getElementById("pet-bubble");
+    if (pet.open || !text) { bubble.hidden = true; return; }
+    bubble.textContent = text;
+    bubble.hidden = false;
+    clearTimeout(pet.bubbleTimer);
+    pet.bubbleTimer = setTimeout(() => { bubble.hidden = true; }, 8000);
+}
+
+function petOnView(view) {
+    const wasAuthed = pet.authed;
+    pet.view = view;
+    pet.authed = view !== "auth";
+    if (wasAuthed !== pet.authed) {       // logged in/out: start a fresh conversation
+        pet.history = [];
+        document.getElementById("pet-log").innerHTML = "";
+        if (pet.open) setPetOpen(true);
+    }
+    document.getElementById("pet-root").hidden = false;
+    document.getElementById("pet-input").disabled = !pet.authed;
+    document.getElementById("pet-send").disabled = !pet.authed;
+    document.getElementById("pet-input").placeholder = pet.authed ? "Ask me anything about the site..." : "Log in to chat with me";
+    renderPetChips();
+    if (pet.tips && !pet.greeted.has(view) && PET_TIPS[view]) {
+        pet.greeted.add(view);
+        petBubble(PET_TIPS[view].replace("{pet}", pet.name));
+    }
+}
+
+function setPetOpen(open) {
+    pet.open = open;
+    document.getElementById("pet-panel").hidden = !open;
+    document.getElementById("pet-bubble").hidden = true;
+    if (open) {
+        const log = document.getElementById("pet-log");
+        if (!log.children.length) {
+            petSay(pet.authed
+                ? `Meow! I'm ${pet.name}. Ask me how anything works, or tell me where you want to go.`
+                : `Meow! I'm ${pet.name}. Sign up with your official college email, and once you're in I can guide you around.`);
+        }
+        if (pet.authed) document.getElementById("pet-input").focus();
+    }
+}
+
+async function petSend(text) {
+    text = (text || "").trim();
+    if (!text || pet.busy || !pet.authed) return;
+    pet.busy = true;
+    document.getElementById("pet-root").classList.add("thinking");
+    petSay(text, "me");
+    pet.history.push({ role: "user", text });
+    renderPetChips();
+    const typing = petSay(`${pet.name} is thinking...`, "pet typing");
+    try {
+        const data = await apiFetch("/pet/chat", {
+            method: "POST",
+            body: JSON.stringify({ message: text, view: pet.view, history: pet.history.slice(0, -1).slice(-8) }),
+        });
+        typing.remove();
+        petSay(data.reply);
+        pet.history.push({ role: "pet", text: data.reply });
+        if (data.goto) petGoButton(data.goto);
+    } catch (err) {
+        typing.remove();
+        if (err.status === 401) { showAuth("login"); return; }
+        petSay(err.message || "Oops, I tripped over my own tail. Try again?");
+    } finally {
+        pet.busy = false;
+        document.getElementById("pet-root").classList.remove("thinking");
+    }
+}
+
+async function initPet() {
+    pet.tips = petStore("pet_tips") !== "off";
+    document.getElementById("pet-tips-toggle").textContent = `Tips: ${pet.tips ? "on" : "off"}`;
+    try {
+        const cfg = await (await fetch("/api/pet/config")).json();
+        pet.name = cfg.name || pet.name; pet.ai = !!cfg.ai;
+    } catch (e) { /* offline guide still works */ }
+    document.getElementById("pet-title").textContent = pet.name;
+    document.getElementById("pet-subtitle").textContent = pet.ai ? "Your campus guide · powered by Gemini" : "Your campus guide";
+    document.getElementById("pet-btn").setAttribute("aria-label", `Open ${pet.name}, the campus pet guide`);
+    document.getElementById("pet-btn").onclick = () => setPetOpen(!pet.open);
+    document.getElementById("pet-close").onclick = () => setPetOpen(false);
+    document.getElementById("pet-bubble").onclick = () => setPetOpen(true);
+    document.getElementById("pet-tips-toggle").onclick = (e) => {
+        pet.tips = !pet.tips;
+        petStore("pet_tips", pet.tips ? "on" : "off");
+        e.target.textContent = `Tips: ${pet.tips ? "on" : "off"}`;
+    };
+    document.getElementById("pet-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = document.getElementById("pet-input");
+        const v = input.value; input.value = "";
+        petSend(v);
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pet.open) setPetOpen(false); });
+    petOnView(pet.view);
+}
+
+function initListeners() {
+    document.getElementById("login-form").addEventListener("submit", onLoginSubmit);
+    document.getElementById("register-form").addEventListener("submit", onRegisterSubmit);
+    initAttachments();
+    document.getElementById("composer-form").addEventListener("submit", onCreatePost);
+    document.getElementById("search-input").addEventListener("input", onSearchInput);
+    document.getElementById("group-search").addEventListener("input", onGroupSearchInput);
+    document.getElementById("create-announcement-form").addEventListener("submit", onCreateAnnouncement);
+    document.getElementById("profile-form").addEventListener("submit", onSaveProfile);
+    document.getElementById("create-group-form").addEventListener("submit", onCreateGroup);
+    document.getElementById("group-composer-form").addEventListener("submit", onGroupPost);
+    document.getElementById("create-event-form").addEventListener("submit", onCreateEvent);
+    document.getElementById("create-resource-form").addEventListener("submit", onCreateResource);
+}
+
+function renderStaticIcons() {
+    const map = {
+        "icon-pencil": ICONS.pencil,
+        "icon-feed": ICONS.feed,
+        "icon-search": ICONS.search,
+        "icon-requests": ICONS.friends,
+        "icon-friends-list": ICONS.friends,
+        "icon-profile": ICONS.idCard,
+        "icon-group-create": ICONS.gradCap,
+        "icon-group-list": ICONS.book,
+        "icon-group-detail": ICONS.groups,
+        "icon-group-post": ICONS.pencil,
+        "icon-event-create": ICONS.events,
+        "icon-event-list": ICONS.events,
+        "icon-resource-create": ICONS.resources,
+        "icon-reels": ICONS.reels,
+        "icon-announce": ICONS.bell,
+        "icon-suggestions": ICONS.friends,
+        "icon-resource-list": ICONS.book,
+        "icon-notifications": ICONS.bell,
+        "icon-game-ttt": ICONS.trophy,
+        "icon-game-puzzle": ICONS.trophy,
+    };
+    Object.entries(map).forEach(([id, svg]) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = svg;
+    });
+}
+
+function emptyState(icon, text) {
+    return `<div class="empty-state"><div class="empty-state-icon">${icon}</div><p>${text}</p></div>`;
+}
+
+async function init() {
+    document.getElementById("hero-logo").innerHTML = `${ICONS.brand}<span>CampusConnect</span>`;
+    document.getElementById("hero-features").innerHTML = `
+        <div class="auth-hero-feature"><span class="icon-badge">${ICONS.friends}</span> Find and friend real classmates</div>
+        <div class="auth-hero-feature"><span class="icon-badge">${ICONS.groups}</span> Join academic discussion groups</div>
+        <div class="auth-hero-feature"><span class="icon-badge">${ICONS.events}</span> Never miss a campus event</div>
+        <div class="auth-hero-feature"><span class="icon-badge">${ICONS.resources}</span> Share notes, links, and resources</div>
+        <div class="auth-hero-feature"><span class="icon-badge">${ICONS.games}</span> Learn algorithms by playing them: minimax and BFS games</div>
+    `;
+    renderStaticIcons();
+    initListeners();
+    initPalette();
+    initPet();
+
+    try {
+        await apiFetch("/auth/me");
+        showApp("dashboard");
+    } catch (e) {
+        showAuth("login");
+    }
+}
+
+init();
+</script>
+<script src="/reels.js"></script>
+</body>
+</html>

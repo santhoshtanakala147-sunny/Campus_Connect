@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-shell">
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <div class="logo-mark" id="hero-logo"></div>
+                <h2>Welcome back to your campus network.</h2>
+                <p>Connect with classmates, join study groups, and stay on top of everything happening at your college — and others too.</p>
+                <div class="auth-hero-features" id="hero-features"></div>
+            </div>
+        </div>
+
+        <div class="auth-form-side">
+            <div class="card form-card">
+                <h1>Welcome back</h1>
+                <p class="subtitle">Log in with your college email.</p>
+                <div id="flash" class="flash"></div>
+                <form id="login-form">
+                    <label for="email">College email</label>
+                    <input type="email" id="email" name="email" placeholder="you@college.edu" required>
+
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+                    <button type="submit">Log in</button>
+                </form>
+                <p class="switch-link">New here? <a href="register.html">Create an account</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.getElementById("hero-logo").innerHTML = `${ICONS.brand}<span>CampusConnect</span>`;
+        document.getElementById("hero-features").innerHTML = `
+            <div class="auth-hero-feature"><span class="icon-badge">${ICONS.friends}</span> Find and friend real classmates</div>
+            <div class="auth-hero-feature"><span class="icon-badge">${ICONS.groups}</span> Join academic discussion groups</div>
+            <div class="auth-hero-feature"><span class="icon-badge">${ICONS.events}</span> Never miss a campus event</div>
+        `;
+    </script>
+    <script src="js/login.js"></script>
+</body>
+</html>

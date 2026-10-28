@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Profile - CampusConnect{% endblock %}
+{% block content %}
+<div class="card form-card">
+    <h1>{{ user['full_name'] }}</h1>
+    <p class="subtitle">{{ user['email'] }} &middot; {{ user['college'] }}</p>
+    <form method="POST">
+        <label>Bio</label>
+        <textarea name="bio" rows="3">{{ profile['bio'] }}</textarea>
+
+        <label>Major</label>
+        <input type="text" name="major" value="{{ profile['major'] }}">
+
+        <label>Year</label>
+        <input type="text" name="year" value="{{ profile['year'] }}">
+
+        <label>Interests</label>
+        <input type="text" name="interests" value="{{ profile['interests'] }}" placeholder="comma-separated">
+
+        <button type="submit">Save changes</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+:root {
+    --primary: #1E2761;
+    --secondary: #CADCFC;
+    --accent: #FFFFFF;
+    --text: #1a1a1a;
+    --muted: #5a5a6e;
+    --error: #b3261e;
+    --success: #1e7a3e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Calibri, Arial, sans-serif;
+    color: var(--text);
+    background: #f4f5fa;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary);
+    color: var(--accent);
+    padding: 16px 32px;
+}
+
+.navbar .brand {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.nav-links a {
+    color: var(--secondary);
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 14px;
+}
+
+.nav-links a:hover { color: var(--accent); }
+
+.container {
+    max-width: 720px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: var(--accent);
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.form-card { max-width: 480px; margin: 0 auto; }
+
+h1 { margin-top: 0; font-size: 28px; color: var(--primary); }
+
+.subtitle { color: var(--muted); margin-top: -8px; }
+
+label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--muted);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d0d2de;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+button {
+    margin-top: 24px;
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: var(--accent);
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover { opacity: 0.9; }
+
+.switch-link { margin-top: 16px; font-size: 13px; color: var(--muted); }
+.switch-link a { color: var(--primary); }
+
+.flash-messages { margin-bottom: 20px; }
+
+.flash {
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.flash-error { background: #fbeaea; color: var(--error); }
+.flash-success { background: #e8f5ec; color: var(--success); }
+
+.stat-row { display: flex; gap: 32px; margin-top: 16px; }
+.stat-number { font-size: 32px; font-weight: bold; color: var(--primary); }
+.stat-label { font-size: 13px; color: var(--muted); }
+
+.placeholder-note { margin-top: 24px; color: var(--muted); font-size: 13px; }

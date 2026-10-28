@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups - CampusConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="app-nav"></nav>
+
+    <main class="container">
+        <div class="card">
+            <h1>Start a discussion group</h1>
+            <div id="create-flash" class="flash"></div>
+            <form id="create-group-form">
+                <label for="group-name">Group name</label>
+                <input type="text" id="group-name" required>
+                <label for="group-topic">Topic</label>
+                <input type="text" id="group-topic" placeholder="e.g. Data Structures, Placement Prep" required>
+                <button type="submit">Create group</button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 24px;">
+            <h1>Academic groups</h1>
+            <div id="groups-flash" class="flash"></div>
+            <div id="groups-list" class="list"></div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/notif.js"></script>
+    <script src="js/groups.js"></script>
+</body>
+</html>
